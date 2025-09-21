@@ -45,7 +45,7 @@ namespace WindowManager.Services
                 {
                     try
                     {
-                        return process.MainWindowHandle != IntPtr.Zero;   
+                        return process.MainWindowHandle != IntPtr.Zero && !string.IsNullOrWhiteSpace(process.MainWindowTitle);
                     }
                     catch
                     {

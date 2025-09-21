@@ -5,16 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WindowManager"
         mc:Ignorable="d"
-        KeyDown="WindowKeyDown"
         Focusable="True"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
         <StackPanel Grid.Column="0" Margin="10" VerticalAlignment="Top">
             <Button Content="Start program" Width="100" Margin="0,0,0,5" Click="StartProgramButton"/>
-        </StackPanel>
-        <StackPanel Grid.Column="0" Margin="10" VerticalAlignment="Center">
-            <Button Content="List programs" Width="100" Margin="0,0,0,5" Click="ListALLRunnigProgramsButton"/>
-            <ListBox x:Name="ProgramsList" Height="200"/>
         </StackPanel>
     </Grid>
 </Window>
