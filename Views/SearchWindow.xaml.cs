@@ -12,6 +12,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using WindowManager.ViewModels;
 
 namespace WindowManager.Views
 {
@@ -20,14 +21,11 @@ namespace WindowManager.Views
     /// </summary>
     public partial class SearchWindow : Window
     {
-        private readonly Process[] _programs;
-        public Process? SelectedProcess { get; private set; }
-
-        public SearchWindow(Process[] programs)
+        public SearchWindow(SearchViewModel viewModel)
         {
             InitializeComponent();
-            _programs = programs;
-            ResultsList.ItemsSource = _programs;
+            DataContext = viewModel;
+
 
             Loaded += (s, e) => SearchBox.Focus();
 

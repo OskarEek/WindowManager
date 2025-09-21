@@ -28,12 +28,16 @@ public partial class App : Application
         // Register services
         services.AddSingleton<User32Service>();
         services.AddSingleton<ProgramService>();
+        services.AddSingleton<WindowService>();
 
         // Register viewmodels
+        //services.AddSingleton<MainViewModel>(sp => new MainViewModel(s_forkProgramPath, sp.GetRequiredService<ProgramService>()));
         services.AddSingleton<MainViewModel>(sp => new MainViewModel(s_forkProgramPath, sp.GetRequiredService<ProgramService>()));
+        services.AddSingleton<SearchViewModel>();
 
         // Register views
         services.AddSingleton<MainWindow>();
+        services.AddSingleton<SearchWindow>();
 
         _serviceProvider = services.BuildServiceProvider();
 
