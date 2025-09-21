@@ -37,7 +37,7 @@ namespace WindowManager.Services
         }
 
         public void RestoreWindowFromMinimized(IntPtr hWnd) {
-            if (IsIconic(hWnd))
+            if (IsIconic(hWnd)) //TODO: possibly dont have to do this check, have not tried without it
             {
                 ShowWindow(hWnd, SW_RESTORE);
             }
