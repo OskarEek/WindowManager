@@ -43,6 +43,7 @@ public partial class MainWindow : Window
     {
         if (Keyboard.IsKeyDown(Key.LeftShift) && Keyboard.IsKeyDown(Key.RightShift))
         {
+            // TODO : Open a window enter what program to open
             (DataContext as MainViewModel)?.OnStartProgramButtonClick(0);
         }
     }

@@ -40,8 +40,19 @@ namespace WindowManager.Services
         public List<Process> ListRunningPrograms()
         {
             var processes = Process.GetProcesses().ToList();
-            // TODO: Restrict the list to valid "relevant" programs
-            return processes;
+            var programs = processes
+                .Where(process =>
+                {
+                    try
+                    {
+                        return process.MainWindowHandle != IntPtr.Zero;   
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                }).ToList();
+            return programs;
         }
     }
 }
