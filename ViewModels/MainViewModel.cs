@@ -24,9 +24,9 @@ namespace WindowManager.ViewModels
             _programService.OpenProgram(_programPath);
         }
 
-        public List<Process> OnListALLRunnigProgramsButtonClick()
+        public Process[] OnListALLRunnigProgramsButtonClick()
         {
-            var processes = _programService.ListRunningPrograms();
+            var processes = _programService.ListRunningPrograms().ToArray();
             return processes;
         }
     }

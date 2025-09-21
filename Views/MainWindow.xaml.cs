@@ -30,11 +30,11 @@ public partial class MainWindow : Window
 
     private void ListALLRunnigProgramsButton(object sender, RoutedEventArgs e)
     {
-        var processes = (DataContext as MainViewModel)?.OnListALLRunnigProgramsButtonClick()
-                ?? new List<Process>();
+        var programs = (DataContext as MainViewModel)?.OnListALLRunnigProgramsButtonClick()
+                ?? new Process[0];
 
         ProgramsList.Items.Clear();
-        foreach (var process in processes)
+        foreach (var process in programs)
         {
             ProgramsList.Items.Add(process.ProcessName);
         }
@@ -43,8 +43,18 @@ public partial class MainWindow : Window
     {
         if (Keyboard.IsKeyDown(Key.LeftShift) && Keyboard.IsKeyDown(Key.RightShift))
         {
+            var programs = (DataContext as MainViewModel)?.OnListALLRunnigProgramsButtonClick()
+                ?? new Process[0];
+
+
+            if (programs.Length > 0)
+            {
+                var searchWindow = new SearchWindow(programs);
+
+                searchWindow.Show();
+            }
             // TODO : Open a window enter what program to open
-            (DataContext as MainViewModel)?.OnStartProgramButtonClick(0);
+            
         }
     }
 }
