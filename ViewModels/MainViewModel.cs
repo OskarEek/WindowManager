@@ -8,7 +8,7 @@ using WindowManager.Services;
 
 namespace WindowManager.ViewModels
 {
-    class MainViewModel
+    public class MainViewModel
     {
         private readonly string _programPath;
         private readonly ProgramService _programService;
@@ -19,7 +19,7 @@ namespace WindowManager.ViewModels
             _programPath = programPath;
         }
 
-        public void OnStartProgramButtonClick(int window)
+        public void OnStartProgramButtonClick()
         {
             _programService.OpenProgram(_programPath);
         }

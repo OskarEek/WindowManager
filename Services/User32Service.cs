@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace WindowManager.Services
 {
-    class WindowsService
+    public class User32Service
     {
         const uint GW_OWNER = 4; //Window owner
         private const int SW_RESTORE = 9; //Restore if minimized
@@ -16,7 +16,7 @@ namespace WindowManager.Services
         public bool FocusWindow(IntPtr hWnd) =>
             SetForegroundWindow(hWnd);
 
-        public List<IntPtr> GetProcessWindows(int processId)
+        public List<IntPtr> GetTopLevelWindows(int processId)
         {
             var windowHandles = new List<IntPtr>();
 

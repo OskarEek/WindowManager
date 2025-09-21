@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using WindowManager.ViewModels;
+using WindowManager.Services;
 
 namespace WindowManager.Views
 {
@@ -23,6 +24,8 @@ namespace WindowManager.Views
         private const int VK_LSHIFT = 0xA0;
         private const int VK_RSHIFT = 0xA1;
 
+        private readonly WindowService _windowService;
+
         private bool leftShiftDown = false;
         private bool rightShiftDown = false;
 
@@ -31,9 +34,10 @@ namespace WindowManager.Views
 
         private delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
 
-        public MainWindow()
+        public MainWindow(WindowService windowService)
         {
             InitializeComponent();
+            _windowService = windowService;
 
             Loaded += (s, e) =>
             {
@@ -47,7 +51,6 @@ namespace WindowManager.Views
             };
         }
 
-
         private IntPtr SetHook(LowLevelKeyboardProc proc)
         {
             using (var currentProcess = Process.GetCurrentProcess())
@@ -56,7 +59,6 @@ namespace WindowManager.Views
                 return SetWindowsHookEx(WH_KEYBOARD_LL, proc, GetModuleHandle(currentModule.ModuleName), 0);
             }
         }
-
 
         [DllImport("user32.dll", SetLastError = true)]
         private static extern IntPtr SetWindowsHookEx(int idHook, LowLevelKeyboardProc lpfn, IntPtr hMod, uint dwThreadId);
@@ -101,19 +103,12 @@ namespace WindowManager.Views
 
         private void OpenSearchWindow()
         {
-            var programs = (DataContext as MainViewModel)?.OnListALLRunnigProgramsButtonClick()
-                ?? new Process[0];
-
-            if (programs.Length > 0)
-            {
-                var searchWindow = new SearchWindow(programs);
-                searchWindow.Show();
-            }
+            _windowService.ShowSearchWindow();
         }
 
         private void StartProgramButton(object sender, RoutedEventArgs e)
         {
-            (DataContext as MainViewModel)?.OnStartProgramButtonClick(0);
+            (DataContext as MainViewModel)?.OnStartProgramButtonClick();
         }
     }
 }
