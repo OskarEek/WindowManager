@@ -37,14 +37,17 @@ namespace WindowManager.Views
             {
                 Close();
             }
-            else if (Keyboard.IsKeyDown(Key.K)) //TODO: couldn't get this to work with Key.Up
+            else if (Keyboard.IsKeyDown(Key.Up))
             {
                 (DataContext as SearchViewModel).SelectPreviousProgram();
+                e.Handled = true; //Prevent listbox from handling event
             }
-            else if (Keyboard.IsKeyDown(Key.J)) //TODO: couldn't get this to work with Key.Down
+            else if (Keyboard.IsKeyDown(Key.Down))
             {
                 (DataContext as SearchViewModel).SelectNextProgram();
+                e.Handled = true; //Prevent listbox from handling event
             }
         }
     }
+        
 }
