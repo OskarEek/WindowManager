@@ -30,5 +30,27 @@ namespace WindowManager.Views
             Loaded += (s, e) => SearchBox.Focus();
 
         }
+
+        private void KeyDownEvent(object sender, KeyEventArgs e)
+        {
+            if (Keyboard.IsKeyDown(Key.Enter))
+            {
+                bool selected = (DataContext as SearchViewModel).OpenSelectedProgram();
+                if (selected)
+                    Close();
+            }
+            else if (Keyboard.IsKeyDown(Key.Escape))
+            {
+                Close();
+            }
+            else if (Keyboard.IsKeyDown(Key.K)) //TODO: couldn't get this to work with Key.Up
+            {
+                (DataContext as SearchViewModel).SelectPreviousProgram();
+            }
+            else if (Keyboard.IsKeyDown(Key.J)) //TODO: couldn't get this to work with Key.Down
+            {
+                (DataContext as SearchViewModel).SelectNextProgram();
+            }
+        }
     }
 }

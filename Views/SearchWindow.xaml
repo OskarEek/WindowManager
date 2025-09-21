@@ -12,7 +12,8 @@
         WindowStyle="ToolWindow"
         Topmost="True"
         Focusable="True"
-        ShowInTaskbar="False">
+        ShowInTaskbar="False"
+        KeyDown="KeyDownEvent">
     <Grid>
         <TextBox x:Name="SearchBox"
                  FontSize="16"
@@ -21,6 +22,7 @@
                  />
 
         <ListBox ItemsSource="{Binding Programs}"
+                 SelectedItem="{Binding SelectedProgram, Mode=TwoWay}"
                  FontSize="14"
                  SelectionMode="Single"
                  DisplayMemberPath="ProcessName"/>
