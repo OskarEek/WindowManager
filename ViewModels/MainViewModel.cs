@@ -7,7 +7,7 @@ using WindowManager.Services;
 
 namespace WindowManager.ViewModels
 {
-    class MainViewModel
+    public class MainViewModel
     {
         private readonly string _programPath;
         private readonly ProgramService _programService;

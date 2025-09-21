@@ -3,17 +3,17 @@ using System.IO;
 
 namespace WindowManager.Services
 {
-    class ProgramService
+    public class ProgramService
     {
-        private readonly WindowsService _windowsService;
-        public ProgramService()
+        private readonly User32Service _user32Service;
+        public ProgramService(User32Service user32Service)
         {
-            _windowsService = new WindowsService(); //TODO: Rebuild this with dependecy injection
+            _user32Service = user32Service;
         }
 
         public void OpenProgram(int processId)
         {
-            List<IntPtr> windows = _windowsService.GetProcessWindows(processId);
+            List<IntPtr> windows = _user32Service.GetProcessWindows(processId);
 
             if (windows.Count == 0)
                 throw new Exception($"No windows found for program with id: {processId}");
@@ -22,8 +22,8 @@ namespace WindowManager.Services
             var index = windows.Count() > 1 ? 1 : 0; 
             IntPtr windowPtr = windows[index];
 
-            _windowsService.RestoreWindowFromMinimized(windowPtr); 
-            _windowsService.FocusWindow(windowPtr);
+            _user32Service.RestoreWindowFromMinimized(windowPtr); 
+            _user32Service.FocusWindow(windowPtr);
         }
 
         public void OpenProgram(string path, bool newWindow = false)
@@ -37,14 +37,14 @@ namespace WindowManager.Services
                 return; 
             }
 
-            List<IntPtr> windows = _windowsService.GetProcessWindows(process.Id);
+            List<IntPtr> windows = _user32Service.GetProcessWindows(process.Id);
 
             //TODO: rebuild this
             var index = windows.Count() > 1 ? 1 : 0; 
             IntPtr windowPtr = windows[index];
 
-            _windowsService.RestoreWindowFromMinimized(windowPtr); 
-            _windowsService.FocusWindow(windowPtr);
+            _user32Service.RestoreWindowFromMinimized(windowPtr); 
+            _user32Service.FocusWindow(windowPtr);
         }
 
         private void StartProgram(string path)
