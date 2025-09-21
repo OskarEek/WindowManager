@@ -12,7 +12,7 @@ namespace WindowManager;
 /// </summary>
 public partial class App : Application
 {
-    private static readonly string s_programPath = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
+    private static readonly string s_programPath = "C:\\Program Files\\Firefox Developer Edition\\firefox.exe";
     private ProgramService? _programService;
     protected override void OnStartup(StartupEventArgs e)
     {

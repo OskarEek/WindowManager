@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,6 +22,12 @@ namespace WindowManager.ViewModels
         public void OnStartProgramButtonClick(int window)
         {
             _programService.OpenProgram(_programPath);
+        }
+
+        public Process[] OnListALLRunnigProgramsButtonClick()
+        {
+            var processes = _programService.ListRunningPrograms().ToArray();
+            return processes;
         }
     }
 }
