@@ -1,6 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using System.Configuration;
-using System.Data;
 using System.Windows;
 using WindowManager.Services;
 using WindowManager.ViewModels;
@@ -15,10 +13,6 @@ public partial class App : Application
 {
     private ServiceProvider? _serviceProvider;
 
-    private static readonly string s_firefoxProgramPath = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-
-    private static readonly string s_forkProgramPath = "C:\\Users\\farss\\AppData\\Local\\Fork\\current\\Fork.exe";
-
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
@@ -32,7 +26,7 @@ public partial class App : Application
 
         // Register viewmodels
         //services.AddSingleton<MainViewModel>(sp => new MainViewModel(s_forkProgramPath, sp.GetRequiredService<ProgramService>()));
-        services.AddSingleton<MainViewModel>(sp => new MainViewModel(s_forkProgramPath, sp.GetRequiredService<ProgramService>()));
+        services.AddSingleton<MainViewModel>();
         services.AddTransient<SearchViewModel>();
 
         // Register views

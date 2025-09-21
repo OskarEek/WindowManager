@@ -1,16 +1,6 @@
-﻿using System;
-using System.Diagnostics;
-using System.Text;
+﻿using System.Diagnostics;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Runtime.InteropServices;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using WindowManager.ViewModels;
 using WindowManager.Services;
 
@@ -104,11 +94,6 @@ namespace WindowManager.Views
         private void OpenSearchWindow()
         {
             _windowService.ShowSearchWindow();
-        }
-
-        private void StartProgramButton(object sender, RoutedEventArgs e)
-        {
-            (DataContext as MainViewModel)?.OnStartProgramButtonClick();
         }
     }
 }
