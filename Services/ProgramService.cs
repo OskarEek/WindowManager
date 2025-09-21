@@ -11,6 +11,21 @@ namespace WindowManager.Services
             _windowsService = new WindowsService(); //TODO: Rebuild this with dependecy injection
         }
 
+        public void OpenProgram(int processId)
+        {
+            List<IntPtr> windows = _windowsService.GetProcessWindows(processId);
+
+            if (windows.Count == 0)
+                throw new Exception($"No windows found for program with id: {processId}");
+
+            //TODO: rebuild this
+            var index = windows.Count() > 1 ? 1 : 0; 
+            IntPtr windowPtr = windows[index];
+
+            _windowsService.RestoreWindowFromMinimized(windowPtr); 
+            _windowsService.FocusWindow(windowPtr);
+        }
+
         public void OpenProgram(string path, bool newWindow = false)
         {
             string name = Path.GetFileNameWithoutExtension(path);
