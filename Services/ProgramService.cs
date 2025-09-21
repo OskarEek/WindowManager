@@ -11,21 +11,25 @@ namespace WindowManager.Services
             _windowsService = new WindowsService(); //TODO: Rebuild this with dependecy injection
         }
 
-        public void OpenProgram(string path)
+        public void OpenProgram(string path, bool newWindow = false)
         {
             string name = Path.GetFileNameWithoutExtension(path);
             var process= Process.GetProcessesByName(name).FirstOrDefault();
 
-            if (process == null)
+            if (process == null || newWindow)
             {
                 StartProgram(path);
                 return; 
             }
 
-            //Focus existing window
-            List<nint> windows = _windowsService.GetWindowsForProcess(process.Id);
-            var index = windows.Count() > 1 ? 1 : 0; //TODO: rebuild this
-            _windowsService.FocusWindow(windows[index]);
+            List<IntPtr> windows = _windowsService.GetWindowsForProcess(process.Id);
+
+            //TODO: rebuild this
+            var index = windows.Count() > 1 ? 1 : 0; 
+            IntPtr windowPtr = windows[index];
+
+            _windowsService.RestoreWindowFromMinimized(windowPtr); 
+            _windowsService.FocusWindow(windowPtr);
         }
 
         private void StartProgram(string path)

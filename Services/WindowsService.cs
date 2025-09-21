@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -9,7 +10,9 @@ namespace WindowManager.Services
 {
     class WindowsService
     {
-        const uint GW_OWNER = 4;
+        const uint GW_OWNER = 4; //Window owner
+        private const int SW_RESTORE = 9; //Restore if minimized
+
         public bool FocusWindow(IntPtr hWnd) =>
             SetForegroundWindow(hWnd);
 
@@ -33,6 +36,13 @@ namespace WindowManager.Services
             return windowHandles;
         }
 
+        public void RestoreWindowFromMinimized(IntPtr hWnd) {
+            if (IsIconic(hWnd))
+            {
+                ShowWindow(hWnd, SW_RESTORE);
+            }
+        }
+
         private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
 
         [DllImport("user32.dll")]
@@ -46,8 +56,14 @@ namespace WindowManager.Services
 
         [DllImport("user32.dll")]
         private static extern bool IsWindowVisible(IntPtr hWnd);
+
         [DllImport("user32.dll")]
         private static extern IntPtr GetWindow(IntPtr hWnd, uint uCmd);
 
+        [DllImport("user32.dll")]
+        private static extern bool IsIconic(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
     }
 }
