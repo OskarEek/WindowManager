@@ -51,5 +51,23 @@ namespace WindowManager.Services
         {
             Process.Start(path);
         }
+
+        public List<Process> ListRunningPrograms()
+        {
+            var processes = Process.GetProcesses().ToList();
+            var programs = processes
+                .Where(process =>
+                {
+                    try
+                    {
+                        return process.MainWindowHandle != IntPtr.Zero && !string.IsNullOrWhiteSpace(process.MainWindowTitle);
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                }).ToList();
+            return programs;
+        }
     }
 }

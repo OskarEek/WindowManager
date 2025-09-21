@@ -1,0 +1,29 @@
+﻿<Window x:Class="WindowManager.Views.SearchWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WindowManager.Views"
+        mc:Ignorable="d"
+        Title="Quick Switch"
+        Width="360" Height="240"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        WindowStyle="ToolWindow"
+        Topmost="True"
+        Focusable="True"
+        ShowInTaskbar="False">
+    <Grid>
+        <TextBox x:Name="SearchBox"
+                 FontSize="16"
+                 DockPanel.Dock="Top"
+                 Margin="0,0,0,8"
+                 />
+
+        <ListBox x:Name="ResultsList"
+                 FontSize="14"
+                 SelectionMode="Single"
+                 DisplayMemberPath="ProcessName"/>
+        
+    </Grid>
+</Window>
