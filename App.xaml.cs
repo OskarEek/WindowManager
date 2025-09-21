@@ -33,11 +33,11 @@ public partial class App : Application
         // Register viewmodels
         //services.AddSingleton<MainViewModel>(sp => new MainViewModel(s_forkProgramPath, sp.GetRequiredService<ProgramService>()));
         services.AddSingleton<MainViewModel>(sp => new MainViewModel(s_forkProgramPath, sp.GetRequiredService<ProgramService>()));
-        services.AddSingleton<SearchViewModel>();
+        services.AddTransient<SearchViewModel>();
 
         // Register views
         services.AddSingleton<MainWindow>();
-        services.AddSingleton<SearchWindow>();
+        services.AddTransient<SearchWindow>();
 
         _serviceProvider = services.BuildServiceProvider();
 
