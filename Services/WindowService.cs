@@ -16,6 +16,8 @@ namespace WindowManager.Services
         {
             var window = _sp.GetRequiredService<SearchWindow>();
             window.Show();
+            window.Activate();
+            window.Focus();
         }
     }
 }
