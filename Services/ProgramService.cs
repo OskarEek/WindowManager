@@ -13,7 +13,7 @@ namespace WindowManager.Services
 
         public void OpenProgram(int processId)
         {
-            List<IntPtr> windows = _windowsService.GetProcessWindows(processId);
+            List<IntPtr> windows = _windowsService.GetTopLevelWindows(processId);
 
             if (windows.Count == 0)
                 throw new Exception($"No windows found for program with id: {processId}");
