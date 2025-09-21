@@ -25,6 +25,6 @@ public partial class MainWindow : Window
 
     private void StartProgramButton(object sender, RoutedEventArgs e)
     {
-        (DataContext as MainViewModel)?.OnStartProgramButtonClick(0);
+        (DataContext as MainViewModel)?.OnStartProgramButtonClick();
     }
 }
