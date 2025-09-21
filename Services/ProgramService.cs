@@ -36,5 +36,12 @@ namespace WindowManager.Services
         {
             Process.Start(path);
         }
+
+        public List<Process> ListRunningPrograms()
+        {
+            var processes = Process.GetProcesses().ToList();
+            // TODO: Restrict the list to valid "relevant" programs
+            return processes;
+        }
     }
 }
