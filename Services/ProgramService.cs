@@ -14,7 +14,7 @@ namespace WindowManager.Services
         public void OpenProgram(string path, bool newWindow = false)
         {
             string name = Path.GetFileNameWithoutExtension(path);
-            var process= Process.GetProcessesByName(name).FirstOrDefault();
+            Process? process= Process.GetProcessesByName(name).FirstOrDefault();
 
             if (process == null || newWindow)
             {
@@ -22,7 +22,7 @@ namespace WindowManager.Services
                 return; 
             }
 
-            List<IntPtr> windows = _windowsService.GetProcessWindows(process.Id);
+            List<IntPtr> windows = _windowsService.GetTopLevelWindows(process.Id);
 
             //TODO: rebuild this
             var index = windows.Count() > 1 ? 1 : 0; 

@@ -18,7 +18,7 @@ namespace WindowManager.ViewModels
             _programPath = programPath;
         }
 
-        public void OnStartProgramButtonClick(int window)
+        public void OnStartProgramButtonClick()
         {
             _programService.OpenProgram(_programPath);
         }
