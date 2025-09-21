@@ -16,7 +16,7 @@ namespace WindowManager.Services
         public bool FocusWindow(IntPtr hWnd) =>
             SetForegroundWindow(hWnd);
 
-        public List<IntPtr> GetWindowsForProcess(int processId)
+        public List<IntPtr> GetProcessWindows(int processId)
         {
             var windowHandles = new List<IntPtr>();
 

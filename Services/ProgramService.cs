@@ -22,7 +22,7 @@ namespace WindowManager.Services
                 return; 
             }
 
-            List<IntPtr> windows = _windowsService.GetWindowsForProcess(process.Id);
+            List<IntPtr> windows = _windowsService.GetProcessWindows(process.Id);
 
             //TODO: rebuild this
             var index = windows.Count() > 1 ? 1 : 0; 
