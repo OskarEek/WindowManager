@@ -20,12 +20,13 @@ public partial class App : Application
         var services = new ServiceCollection();
 
         // Register services
+        services.AddSingleton<FileService>();
+        services.AddSingleton<ConfigService>(_ => new ConfigService(_serviceProvider.GetRequiredService<FileService>()));
         services.AddSingleton<User32Service>();
         services.AddSingleton<ProgramService>();
         services.AddSingleton<WindowService>();
 
         // Register viewmodels
-        //services.AddSingleton<MainViewModel>(sp => new MainViewModel(s_forkProgramPath, sp.GetRequiredService<ProgramService>()));
         services.AddSingleton<MainViewModel>();
         services.AddTransient<SearchViewModel>();
 
