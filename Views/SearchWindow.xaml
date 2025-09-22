@@ -30,7 +30,7 @@
             SelectedItem="{Binding SelectedProgram, Mode=TwoWay}"
             FontSize="14"
             SelectionMode="Single"
-            DisplayMemberPath="ProcessName"/>
+            DisplayMemberPath="DisplayName"/>
 
     </Grid>
 </Window>
