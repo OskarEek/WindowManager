@@ -97,13 +97,20 @@
             </ListBox.ItemTemplate>
         </ListBox>
         <StackPanel Grid.Row="1"  Grid.Column="0" Margin="10" VerticalAlignment="Top" Grid.RowSpan="2">
-            <TextBox x:Name="SearchBox"
-                Text="{Binding ProgramPath, UpdateSourceTrigger=PropertyChanged}"
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Add program with path to .exe:" />
+
+            <TextBox Text="{Binding ProgramPath, UpdateSourceTrigger=PropertyChanged}"
                 Width="200"
                 Height="25"
                 Background="#222"
                 BorderBrush="#000000"
                 Foreground="#e5e5e5"/>
+
+            <TextBlock Text="{Binding ErrorMessage, UpdateSourceTrigger=PropertyChanged}"
+                       Grid.Row="0"
+                       Grid.Column="0"
+                       Foreground="#c14949"/>
+
             <Button Content="Add" Width="100" Margin="0,0,0,5" Click="AddProgramButton"/>
         </StackPanel>
     </Grid>
