@@ -1,8 +1,14 @@
 ﻿using System.Diagnostics;
-using System.Windows;
 using System.Runtime.InteropServices;
-using WindowManager.ViewModels;
+using System.Security.AccessControl;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
 using WindowManager.Services;
+using WindowManager.ViewModels;
 
 namespace WindowManager.Views
 {
@@ -86,6 +92,16 @@ namespace WindowManager.Views
         {
             // Trigger ViewModel method
             (DataContext as MainViewModel)?.AddProgramButton();
+        }
+
+        private void ExitProgramButton(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
+        private void MinimizeProgramButton(object sender, RoutedEventArgs e)
+        {
+            this.WindowState = WindowState.Minimized;    
         }
 
         [DllImport("user32.dll", SetLastError = true)]

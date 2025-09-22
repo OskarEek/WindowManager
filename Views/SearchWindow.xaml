@@ -9,7 +9,9 @@
         Width="360" Height="240"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
-        WindowStyle="ToolWindow"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
         Topmost="True"
         Focusable="True"
         ShowInTaskbar="False"
@@ -23,14 +25,18 @@
         <TextBox Grid.Row="0"
             x:Name="SearchBox"
             Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-            Margin="0,0,0,5" Width="200"/>
+            Margin="0,0,0,5" Width="200"
+            Background="#95000000"
+            Foreground="AntiqueWhite"/>
 
         <ListBox Grid.Row="1"
             ItemsSource="{Binding Programs}"
             SelectedItem="{Binding SelectedProgram, Mode=TwoWay}"
             FontSize="14"
             SelectionMode="Single"
-            DisplayMemberPath="DisplayName"/>
+            DisplayMemberPath="DisplayName"
+            Background="#95000000"
+            Foreground="AntiqueWhite"/>
 
     </Grid>
 </Window>
