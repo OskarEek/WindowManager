@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using WindowManager.Models;
 using WindowManager.Services;
 
@@ -9,6 +10,7 @@ namespace WindowManager.ViewModels
     {
         private readonly ConfigService _configService;
         private string? _programPath;
+        private string? _errorMessage;
         public ObservableCollection<ProcessModel> StoredPrograms { get; }
         public string? ProgramPath
         {
@@ -17,8 +19,20 @@ namespace WindowManager.ViewModels
             {
                 if (_programPath != value)
                 {
-                    _programPath = value;
+                    _programPath = CleanProgramPathInput(value);
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ProgramPath)));
+                }
+            }
+        }
+        public string? ErrorMessage
+        {
+            get => _errorMessage;
+            set
+            {
+                if (_errorMessage != value)
+                {
+                    _errorMessage = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ErrorMessage)));
                 }
             }
         }
@@ -36,6 +50,21 @@ namespace WindowManager.ViewModels
             if (string.IsNullOrEmpty(_programPath))
                 return;
 
+            //TODO: these checks is both in _configService.AddProgram, solve this in some better way
+            if (!Path.Exists(_programPath))
+            {
+                SetErrorMessage("This path does not exist");
+                return;
+            }
+
+            if (!_programPath.EndsWith(".exe"))
+            {
+                SetErrorMessage("You need to enter path to a .exe file");
+                return;
+            }
+
+            SetErrorMessage(string.Empty);
+
             _configService.AddProgram(_programPath);
 
             RefreshStoredPrograms();
@@ -50,6 +79,19 @@ namespace WindowManager.ViewModels
             {
                 StoredPrograms.Add(program);
             }
+        }
+
+        public void SetErrorMessage(string errorMessage)
+        {
+            ErrorMessage = errorMessage;
+        }
+
+        private string? CleanProgramPathInput(string? pathValue)
+        {
+            if (!string.IsNullOrEmpty(pathValue) && pathValue.StartsWith("\"") && pathValue.EndsWith("\""))
+                return pathValue.Trim('"');
+
+            return pathValue;
         }
     }
 }
