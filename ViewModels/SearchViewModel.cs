@@ -129,6 +129,7 @@ namespace WindowManager.ViewModels
         private void RefreshPrograms(List<ProcessModel> processes)
         {
             Programs.Clear();
+            processes = processes.OrderBy(x => x.Name).ToList(); //Sort alphabetical order
             foreach (var process in processes)
             {
                 Programs.Add(process);
