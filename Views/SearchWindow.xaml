@@ -26,7 +26,7 @@
             x:Name="SearchBox"
             Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
             Margin="0,0,0,5" Width="200"
-            Background="Black"
+            Background="#95000000"
             Foreground="AntiqueWhite"/>
 
         <ListBox Grid.Row="1"
@@ -35,7 +35,7 @@
             FontSize="14"
             SelectionMode="Single"
             DisplayMemberPath="ProcessName"
-            Background="Black"
+            Background="#95000000"
             Foreground="AntiqueWhite"/>
 
     </Grid>
