@@ -27,16 +27,17 @@
             Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
             Margin="0,0,0,5" Width="200"
             Background="#95000000"
-            Foreground="AntiqueWhite"/>
+            Foreground="#e5e5e5"/>
+
 
         <ListBox Grid.Row="1"
             ItemsSource="{Binding Programs}"
             SelectedItem="{Binding SelectedProgram, Mode=TwoWay}"
             FontSize="14"
-            SelectionMode="Single"
-            DisplayMemberPath="ProcessName"
+            DisplayMemberPath="DisplayName"
             Background="#95000000"
-            Foreground="AntiqueWhite"/>
+            Foreground="#e5e5e5"/>
+
 
     </Grid>
 </Window>
