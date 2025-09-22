@@ -10,7 +10,7 @@ namespace WindowManager.Services
 {
     public class ConfigService
     {
-        private static readonly string s_configFilePath = "config.data";
+        private static readonly string s_configFilePath = "config.json";
         private readonly FileService _fileService;
         private Config _config;
 
