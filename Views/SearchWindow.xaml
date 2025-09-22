@@ -34,7 +34,7 @@
             SelectedItem="{Binding SelectedProgram, Mode=TwoWay}"
             FontSize="14"
             SelectionMode="Single"
-            DisplayMemberPath="ProcessName"
+            DisplayMemberPath="DisplayName"
             Background="#95000000"
             Foreground="AntiqueWhite"/>
 
