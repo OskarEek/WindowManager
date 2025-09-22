@@ -24,10 +24,11 @@ namespace WindowManager.Views
 
         private delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
 
-        public MainWindow(WindowService windowService)
+        public MainWindow(MainViewModel viewModel, WindowService windowService)
         {
             InitializeComponent();
             _windowService = windowService;
+            DataContext = viewModel;
 
             Loaded += (s, e) =>
             {
@@ -79,6 +80,12 @@ namespace WindowManager.Views
         private void OpenSearchWindow()
         {
             _windowService.ShowSearchWindow();
+        }
+
+        private void AddProgramButton(object sender, RoutedEventArgs e)
+        {
+            // Trigger ViewModel method
+            (DataContext as MainViewModel)?.AddProgramButton();
         }
 
         [DllImport("user32.dll", SetLastError = true)]

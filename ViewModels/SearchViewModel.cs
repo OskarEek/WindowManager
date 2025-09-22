@@ -10,6 +10,7 @@ namespace WindowManager.ViewModels
     public class SearchViewModel : INotifyPropertyChanged
     {
         private readonly ProgramService _programService;
+        private readonly ConfigService _configService;
         private ProcessModel? _selectedProgram;
         private string? _searchText;
         private List<ProcessModel> _allPrograms;
@@ -41,9 +42,10 @@ namespace WindowManager.ViewModels
         }
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public SearchViewModel(ProgramService programService)
+        public SearchViewModel(ProgramService programService, ConfigService configService)
         {
             _programService = programService;
+            _configService = configService;
             _allPrograms = new List<ProcessModel>();
             Programs = new ObservableCollection<ProcessModel>();
             LoadPrograms();
@@ -104,12 +106,9 @@ namespace WindowManager.ViewModels
         {
             Programs.Clear();
 
-            //TODO: Get all programs from config
-            //TODO: Filter programs from config based on name
-            var path = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-            var name = Path.GetFileNameWithoutExtension(path);
-            var test = new ProcessModel { Name = name, Path = path };
-            var configPrograms = new List<ProcessModel>() { test };
+            //Stored config programs
+            var config = _configService.GetConfig();
+            var configPrograms = config.Programs; 
 
             //Running programs
             List<Process>? result = _programService.ListRunningPrograms();
