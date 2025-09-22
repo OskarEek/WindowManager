@@ -30,10 +30,11 @@ namespace WindowManager.Views
 
         private delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
 
-        public MainWindow(WindowService windowService)
+        public MainWindow(MainViewModel viewModel, WindowService windowService)
         {
             InitializeComponent();
             _windowService = windowService;
+            DataContext = viewModel;
 
             Loaded += (s, e) =>
             {
@@ -93,6 +94,7 @@ namespace WindowManager.Views
             // Trigger ViewModel method
             (DataContext as MainViewModel)?.AddProgramButton();
         }
+
 
         private void ExitProgramButton(object sender, RoutedEventArgs e)
         {

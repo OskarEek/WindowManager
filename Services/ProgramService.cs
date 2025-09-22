@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.IO;
+using WindowManager.Models;
 
 namespace WindowManager.Services
 {
@@ -9,6 +10,18 @@ namespace WindowManager.Services
         public ProgramService(User32Service user32Service)
         {
             _user32Service = user32Service;
+        }
+
+        public void StartOrOpenProgram(ProcessModel processModel)
+        {
+            if (processModel.ProcessId.HasValue)
+            {
+                OpenProgram(processModel.ProcessId.Value);
+            }
+            else if (!string.IsNullOrEmpty(processModel.Path))
+            {
+                StartProgram(processModel.Path);
+            }
         }
 
         public void OpenProgram(int processId)
@@ -26,12 +39,12 @@ namespace WindowManager.Services
             _user32Service.FocusWindow(windowPtr);
         }
 
-        public void OpenProgram(string path, bool newWindow = false)
+        public void StartOrOpenProgram(string path)
         {
             string name = Path.GetFileNameWithoutExtension(path);
             Process? process= Process.GetProcessesByName(name).FirstOrDefault();
 
-            if (process == null || newWindow)
+            if (process == null)
             {
                 StartProgram(path);
                 return; 
@@ -47,7 +60,7 @@ namespace WindowManager.Services
             _user32Service.FocusWindow(windowPtr);
         }
 
-        private void StartProgram(string path)
+        public void StartProgram(string path)
         {
             Process.Start(path);
         }

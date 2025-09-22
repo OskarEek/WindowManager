@@ -34,6 +34,7 @@
             ItemsSource="{Binding Programs}"
             SelectedItem="{Binding SelectedProgram, Mode=TwoWay}"
             FontSize="14"
+            SelectionMode="Single"
             DisplayMemberPath="DisplayName"
             Background="#95000000"
             Foreground="#e5e5e5"/>
