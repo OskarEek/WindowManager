@@ -85,6 +85,7 @@ namespace WindowManager.Views
 
         private void OpenSearchWindow()
         {
+
             _windowService.ShowSearchWindow();
         }
 
