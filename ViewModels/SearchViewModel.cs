@@ -1,8 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
-using WindowManager.Models;
 using WindowManager.Services;
 
 namespace WindowManager.ViewModels
@@ -10,12 +8,11 @@ namespace WindowManager.ViewModels
     public class SearchViewModel : INotifyPropertyChanged
     {
         private readonly ProgramService _programService;
-        private readonly ConfigService _configService;
-        private ProcessModel? _selectedProgram;
+        private Process? _selectedProgram;
         private string? _searchText;
-        private List<ProcessModel> _allPrograms;
-        public ObservableCollection<ProcessModel> Programs { get; }
-        public ProcessModel? SelectedProgram
+        private List<Process> _allPrograms;
+        public ObservableCollection<Process> Programs { get; }
+        public Process? SelectedProgram
         {
             get => _selectedProgram;
             set
@@ -42,12 +39,11 @@ namespace WindowManager.ViewModels
         }
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public SearchViewModel(ProgramService programService, ConfigService configService)
+        public SearchViewModel(ProgramService programService)
         {
             _programService = programService;
-            _configService = configService;
-            _allPrograms = new List<ProcessModel>();
-            Programs = new ObservableCollection<ProcessModel>();
+            _allPrograms = new List<Process>();
+            Programs = new ObservableCollection<Process>();
             LoadPrograms();
             SelectFirstProgram();
         }
@@ -56,15 +52,12 @@ namespace WindowManager.ViewModels
         {
             if (_selectedProgram == null)
                 return false;
-            _programService.StartOrOpenProgram(_selectedProgram);
+            _programService.OpenProgram(_selectedProgram.Id);
             return true;
         }
 
         public void SelectPreviousProgram()
         {
-            if (_selectedProgram == null)
-                return;
-
             int index = Programs.IndexOf(_selectedProgram);
 
             if (index <= 0)
@@ -75,9 +68,6 @@ namespace WindowManager.ViewModels
 
         public void SelectNextProgram()
         {
-            if (_selectedProgram == null)
-                return;
-
             int index = Programs.IndexOf(_selectedProgram);
 
             if (index >= Programs.Count() - 1)
@@ -93,11 +83,7 @@ namespace WindowManager.ViewModels
                 RefreshPrograms(_allPrograms);
                 return;
             }
-
-            //Filter
-            //TODO: if _searchText contains more characters than previous _searchText, only filter on Programs.Where instad of _allPrograms.Where to increase seach speed
-            List<ProcessModel> programs = _allPrograms.Where(x => x.DisplayName.StartsWith(_searchText)).ToList();
-
+            List<Process> programs = Programs.Where(x => x.ProcessName.ToLower().StartsWith(_searchText)).ToList();
             RefreshPrograms(programs);
             SelectFirstProgram();
         }
@@ -105,33 +91,17 @@ namespace WindowManager.ViewModels
         private void LoadPrograms()
         {
             Programs.Clear();
-
-            //Stored config programs
-            var config = _configService.GetConfig();
-            var configPrograms = config.Programs; 
-
-            //Running programs
             List<Process>? result = _programService.ListRunningPrograms();
-            List<ProcessModel> runningPrograms = result.Select(x => 
-                new ProcessModel() {
-                    Name = x.ProcessName,
-                    ProcessId = x.Id
-                }
-            ).ToList() ??
-            new();
-
-            _allPrograms = configPrograms.Where(p => !runningPrograms.Any(rP => rP.Name == p.Name)).ToList(); 
-            _allPrograms.AddRange(runningPrograms);
-
+            _allPrograms = result ?? new();
             RefreshPrograms(_allPrograms);
         }
 
-        private void RefreshPrograms(List<ProcessModel> processes)
+        private void RefreshPrograms(List<Process> processes)
         {
             Programs.Clear();
-            foreach (var process in processes)
+            foreach (var company in processes)
             {
-                Programs.Add(process);
+                Programs.Add(company);
             }
         }
 
