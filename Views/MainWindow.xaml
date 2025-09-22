@@ -24,6 +24,10 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+        <Border Grid.Column ="0" Grid.Row="0"
+        Background = "Transparent"
+        MouseLeftButtonDown="Border_MouseLeftButtonDown"/>
+        
         <Grid Grid.Row="0" Grid.Column="1">
             
             <Grid.ColumnDefinitions>
@@ -34,9 +38,7 @@
             <Border Grid.Column ="0"
                     Background = "Transparent"
                     MouseLeftButtonDown="Border_MouseLeftButtonDown"/>
-
-
-
+            
             <Grid Grid.Column="1">
                 
                 <Grid.ColumnDefinitions>
