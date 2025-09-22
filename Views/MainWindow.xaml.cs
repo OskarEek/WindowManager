@@ -104,6 +104,14 @@ namespace WindowManager.Views
             this.WindowState = WindowState.Minimized;    
         }
 
+        private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ButtonState == MouseButtonState.Pressed)
+            {
+                try { DragMove(); } catch { }
+            }
+        }
+
         [DllImport("user32.dll", SetLastError = true)]
         private static extern IntPtr SetWindowsHookEx(int idHook, LowLevelKeyboardProc lpfn, IntPtr hMod, uint dwThreadId);
 
