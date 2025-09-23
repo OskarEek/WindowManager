@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
+using System.Windows.Input;
 using WindowManager.Views;
 
 namespace WindowManager.Services
@@ -22,13 +23,20 @@ namespace WindowManager.Services
                 {
                     existing.WindowState = WindowState.Normal;
                 }
-                existing.Focus();
+                existing.Topmost = true;
+                existing.Activate();
+                Keyboard.Focus(existing.SearchBox);
                 return;
             }
+
             var window = _sp.GetRequiredService<SearchWindow>();
             window.Show();
-            window.Activate();
-            window.Focus();
+            window.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                window.Topmost = true;
+                window.Activate();
+                Keyboard.Focus(window.SearchBox);
+            }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
         }
     }
 }
