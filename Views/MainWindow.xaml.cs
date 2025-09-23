@@ -1,9 +1,11 @@
-﻿using System.Diagnostics;
+﻿using System.Data;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -22,8 +24,10 @@ namespace WindowManager.Views
 
         private readonly WindowService _windowService;
 
-        private bool leftShiftDown = false;
-        private bool rightShiftDown = false;
+        private bool _leftShiftDown = false;
+        private bool _rightShiftDown = false;
+
+        private bool _capturingShortcut = false;
 
         private IntPtr _hookID = IntPtr.Zero;
         private LowLevelKeyboardProc? _proc;
@@ -65,18 +69,18 @@ namespace WindowManager.Views
 
                 if (wParam == (IntPtr)WM_KEYDOWN)
                 {
-                    if (vkCode == VK_LSHIFT) leftShiftDown = true;
-                    if (vkCode == VK_RSHIFT) rightShiftDown = true;
+                    if (vkCode == VK_LSHIFT) _leftShiftDown = true;
+                    if (vkCode == VK_RSHIFT) _rightShiftDown = true;
 
-                    if (leftShiftDown && rightShiftDown)
+                    if (_leftShiftDown && _rightShiftDown)
                     {
                         OpenSearchWindow();
                     }
                 }
                 else if (wParam == (IntPtr)WM_KEYUP)
                 {
-                    if (vkCode == VK_LSHIFT) leftShiftDown = false;
-                    if (vkCode == VK_RSHIFT) rightShiftDown = false;
+                    if (vkCode == VK_LSHIFT) _leftShiftDown = false;
+                    if (vkCode == VK_RSHIFT) _rightShiftDown = false;
                 }
             }
 
@@ -117,7 +121,9 @@ namespace WindowManager.Views
 
         private void UpdateKeyboardShortcut(object sender, MouseButtonEventArgs e)
         {
-            MessageBox.Show("Clicked");
+            MessageBox.Show("Pressed"); 
+            e.Handled = true;
+            _capturingShortcut = true;
         }
 
         [DllImport("user32.dll", SetLastError = true)]
