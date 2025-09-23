@@ -12,7 +12,7 @@ using WindowManager.ViewModels;
 
 namespace WindowManager.Views
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, IDisposable
     {
         private const int WH_KEYBOARD_LL = 13;
         private const int WM_KEYDOWN = 0x0100;
@@ -26,7 +26,7 @@ namespace WindowManager.Views
         private bool rightShiftDown = false;
 
         private IntPtr _hookID = IntPtr.Zero;
-        private LowLevelKeyboardProc _proc;
+        private LowLevelKeyboardProc? _proc;
 
         private delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
 
@@ -44,7 +44,7 @@ namespace WindowManager.Views
 
             Closing += (s, e) =>
             {
-                UnhookWindowsHookEx(_hookID);
+                Application.Current.Shutdown();
             };
         }
 
@@ -127,5 +127,15 @@ namespace WindowManager.Views
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
         private static extern IntPtr GetModuleHandle(string lpModuleName);
+
+        public void Dispose()
+        {
+            if (_hookID != IntPtr.Zero)
+            {
+                UnhookWindowsHookEx(_hookID);
+                _hookID = IntPtr.Zero;
+            }
+            _proc = null;
+        }
     }
 }
