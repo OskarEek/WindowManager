@@ -21,7 +21,15 @@ namespace WindowManager.Views
 
         private void KeyDownEvent(object sender, KeyEventArgs e)
         {
-            if (Keyboard.IsKeyDown(Key.Enter))
+            if (Keyboard.IsKeyDown(Key.Enter) && Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
+            {
+                bool started = (DataContext as SearchViewModel).StartSelectedProgram();
+                if (started)
+                {
+                    Close();
+                }
+            }
+            else if (Keyboard.IsKeyDown(Key.Enter))
             {
                 bool selected = (DataContext as SearchViewModel).OpenSelectedProgram();
                 if (selected)

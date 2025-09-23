@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Windows;
 using WindowManager.Models;
 using WindowManager.Services;
 
@@ -50,6 +51,32 @@ namespace WindowManager.ViewModels
             Programs = new ObservableCollection<ProcessModel>();
             LoadPrograms();
             SelectFirstProgram();
+        }
+
+        public bool StartSelectedProgram()
+        {
+            if (_selectedProgram == null)
+                return false;
+
+            if (string.IsNullOrEmpty(_selectedProgram.Path))
+
+                _selectedProgram.Path = GetPatchByID(_selectedProgram.ProcessId);
+
+
+            if (string.IsNullOrWhiteSpace(_selectedProgram.Path))
+                return false; 
+
+             _programService.StartProgram(_selectedProgram.Path);
+            return true;   
+        }
+
+        public string? GetPatchByID(int? pid)
+        {
+            if (!pid.HasValue)
+                return null;
+
+            using var p = Process.GetProcessById(pid.Value);
+            return p.MainModule?.FileName;
         }
 
         public bool OpenSelectedProgram()
