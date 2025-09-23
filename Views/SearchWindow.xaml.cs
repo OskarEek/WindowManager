@@ -21,7 +21,12 @@ namespace WindowManager.Views
 
         private void KeyDownEvent(object sender, KeyEventArgs e)
         {
-            if (Keyboard.IsKeyDown(Key.Enter))
+            if (Keyboard.IsKeyDown(Key.Enter) && Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
+            {
+                MessageBox.Show("Enter and shift modifier");
+                e.Handled = true;
+            }
+            else if (Keyboard.IsKeyDown(Key.Enter))
             {
                 bool selected = (DataContext as SearchViewModel).OpenSelectedProgram();
                 if (selected)
