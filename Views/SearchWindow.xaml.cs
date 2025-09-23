@@ -23,8 +23,11 @@ namespace WindowManager.Views
         {
             if (Keyboard.IsKeyDown(Key.Enter) && Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
             {
-                MessageBox.Show("Enter and shift modifier");
-                e.Handled = true;
+                bool started = (DataContext as SearchViewModel).StartSelectedProgram();
+                if (started)
+                {
+                    Close();
+                }
             }
             else if (Keyboard.IsKeyDown(Key.Enter))
             {
