@@ -91,7 +91,8 @@
                                  Foreground="#e5e5e5"
                                  Text="Shortcut"
                                  HorizontalContentAlignment="Center"
-                                 VerticalContentAlignment="Center"/>
+                                 VerticalContentAlignment="Center"
+                                 MouseDoubleClick="UpdateKeyboardShortcut"/>
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>

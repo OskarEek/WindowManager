@@ -114,7 +114,12 @@ namespace WindowManager.Views
                 try { DragMove(); } catch { }
             }
         }
-        
+
+        private void UpdateKeyboardShortcut(object sender, MouseButtonEventArgs e)
+        {
+            MessageBox.Show("Clicked");
+        }
+
         [DllImport("user32.dll", SetLastError = true)]
         private static extern IntPtr SetWindowsHookEx(int idHook, LowLevelKeyboardProc lpfn, IntPtr hMod, uint dwThreadId);
 
