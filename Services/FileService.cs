@@ -43,7 +43,7 @@ namespace WindowManager.Services
                 WriteIndented = true
             };
             var serializedData = JsonSerializer.Serialize(data, options);
-            File.WriteAllText(filePath, serializedData, Encoding.UTF8);
+            File.WriteAllText(filePath, serializedData, Encoding.UTF8); //TODO: Is there some better way to do this? Is the current file deleted and created again every time this runs?
         }
     }
 }
