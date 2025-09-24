@@ -12,5 +12,6 @@ namespace WindowManager.Models
         public string DisplayName => Name.ToLower();
         public int? ProcessId { get; set; }
         public string? Path { get; set; }
+        public string? Shortcut { get; set; }
     }
 }

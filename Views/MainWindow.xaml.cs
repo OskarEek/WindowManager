@@ -9,6 +9,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using WindowManager.Models;
 using WindowManager.Services;
 using WindowManager.ViewModels;
 
@@ -28,6 +29,9 @@ namespace WindowManager.Views
         private bool _rightShiftDown = false;
 
         private bool _capturingShortcut = false;
+
+        private TextBox? _shortcutTextBox;
+        private object? _shortcutProgram;
 
         private IntPtr _hookID = IntPtr.Zero;
         private LowLevelKeyboardProc? _proc;
@@ -63,6 +67,9 @@ namespace WindowManager.Views
 
         private IntPtr HookCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
+            if (_capturingShortcut) 
+                return CallNextHookEx(IntPtr.Zero, nCode, wParam, lParam);  
+            
             if (nCode >= 0)
             {
                 int vkCode = Marshal.ReadInt32(lParam);
@@ -86,6 +93,7 @@ namespace WindowManager.Views
 
             return CallNextHookEx(IntPtr.Zero, nCode, wParam, lParam);
         }
+
 
         private void OpenSearchWindow()
         {
@@ -121,10 +129,19 @@ namespace WindowManager.Views
 
         private void UpdateKeyboardShortcut(object sender, MouseButtonEventArgs e)
         {
-            MessageBox.Show("Pressed"); 
-            e.Handled = true;
             _capturingShortcut = true;
+            _shortcutTextBox = (TextBox)sender;
+            _shortcutProgram = _shortcutTextBox.DataContext;
+
+            if (sender is FrameworkElement fe && fe.DataContext is ProcessModel p)
+                MessageBox.Show($"Name: {p.DisplayName}\nPath: {p.Path}", "This row");
+
+            _rightShiftDown = _leftShiftDown = false;
+
+            e.Handled = true;
         }
+
+
 
         [DllImport("user32.dll", SetLastError = true)]
         private static extern IntPtr SetWindowsHookEx(int idHook, LowLevelKeyboardProc lpfn, IntPtr hMod, uint dwThreadId);

@@ -85,11 +85,11 @@
                                  Height="24" 
                                  VerticalAlignment="Center" 
                                  IsReadOnly="True"
-                                 ToolTip="Click, then press keyboard-shortcut e.g Alt+1"
+                                 ToolTip="doubleclick, then press keyboard-shortcut. Esc to clear."
                                  Background="#222"
                                  BorderBrush="#222"
                                  Foreground="#e5e5e5"
-                                 Text="Shortcut"
+                                 Text="{Binding Shortcut}"
                                  HorizontalContentAlignment="Center"
                                  VerticalContentAlignment="Center"
                                  MouseDoubleClick="UpdateKeyboardShortcut"/>
