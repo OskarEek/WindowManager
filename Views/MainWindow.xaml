@@ -61,6 +61,17 @@
             </Grid>
         </Grid>
         <ListBox Grid.Row="1"  Grid.Column="1" ItemsSource="{Binding StoredPrograms}" SelectedItem="{Binding SelectedProgram, Mode=TwoWay}" Background="#95000000" Foreground="#E5E5E5">
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsValidProgramPath}" Value="False">
+                            <Setter Property="Background" Value="#80C14949"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ListBox.ItemContainerStyle>
+            
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid>
