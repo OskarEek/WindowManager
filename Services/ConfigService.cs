@@ -49,5 +49,14 @@ namespace WindowManager.Services
             _config.Programs.Add(program);
             _fileService.WriteToJsonFile<Config>(s_configFilePath, _config);
         }
+
+        public void DeleteProgram(ProcessModel processModel)
+        {
+            if (!_config.Programs.Contains(processModel))
+                throw new Exception("Tried deleting non-existing program from config");
+
+            _config.Programs.Remove(processModel);
+            _fileService.WriteToJsonFile(s_configFilePath, _config);
+        }
     }
 }
