@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -48,6 +49,22 @@ namespace WindowManager.Services
 
             _config.Programs.Add(program);
             _fileService.WriteToJsonFile<Config>(s_configFilePath, _config);
+        }
+
+        public void QuickSaveShortcut(ProcessModel program)
+        {
+            if (program == null)
+                return;
+
+            var current = _config.Programs.FirstOrDefault(p => 
+            !string.IsNullOrWhiteSpace(program.Path) && string.Equals(p.Path, program.Path, StringComparison.OrdinalIgnoreCase));
+
+            if (current == null)
+                return;
+
+            current.Shortcut = program.Shortcut;
+
+            _fileService.WriteToJsonFile(s_configFilePath, _config);
         }
     }
 }

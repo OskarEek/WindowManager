@@ -81,6 +81,11 @@ namespace WindowManager.ViewModels
             }
         }
 
+        public void SaveShortcut(ProcessModel program)
+        {
+            _configService.QuickSaveShortcut(program);
+        }
+
         public void SetErrorMessage(string errorMessage)
         {
             ErrorMessage = errorMessage;

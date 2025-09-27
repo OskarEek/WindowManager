@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using System.Windows;
@@ -31,8 +32,7 @@ namespace WindowManager.Views
         private bool _capturingShortcut = false;
 
         private TextBox? _shortcutTextBox;
-        private object? _shortcutProgram;
-        private string? _previousShortcut;
+        private ProcessModel? _shortcutProgram;
 
         private static bool IsModifierKey(Key k) =>
             k == Key.LeftCtrl || k == Key.RightCtrl ||
@@ -138,8 +138,7 @@ namespace WindowManager.Views
         {
             _capturingShortcut = true;
             _shortcutTextBox = (TextBox)sender;
-            _shortcutProgram = _shortcutTextBox.DataContext;
-            _previousShortcut = _shortcutTextBox.Text;
+            _shortcutProgram = _shortcutTextBox.DataContext as ProcessModel;
 
             _shortcutTextBox.Text = "Press a Shortcut";
             PreviewKeyDown += OnShortutKeyDown;
@@ -163,7 +162,10 @@ namespace WindowManager.Views
 
             if (key == Key.Escape)
             {
-                _shortcutTextBox.Text = _previousShortcut;
+                if (_shortcutProgram != null)
+                    _shortcutProgram.Shortcut = null;
+                _shortcutTextBox?.GetBindingExpression(TextBox.TextProperty)?.UpdateTarget();
+
                 PreviewKeyDown -= OnShortutKeyDown;
                 e.Handled = true;
                 return;
@@ -184,9 +186,16 @@ namespace WindowManager.Views
             combo.Add(key.ToString());
             string shortcutLabel = string.Join("+", combo);
 
-            _shortcutTextBox.Text = shortcutLabel;
             _capturingShortcut = false;
             PreviewKeyDown -= OnShortutKeyDown;
+
+            if (_shortcutProgram != null)
+                _shortcutProgram.Shortcut = shortcutLabel;
+
+            (DataContext as MainViewModel)?.SaveShortcut(_shortcutProgram);
+
+            _shortcutTextBox?.GetBindingExpression(TextBox.TextProperty)?.UpdateTarget();
+
         }
 
         
