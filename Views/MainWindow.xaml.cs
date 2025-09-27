@@ -32,6 +32,13 @@ namespace WindowManager.Views
 
         private TextBox? _shortcutTextBox;
         private object? _shortcutProgram;
+        private string? _previousShortcut;
+
+        private static bool IsModifierKey(Key k) =>
+            k == Key.LeftCtrl || k == Key.RightCtrl ||
+            k == Key.LeftShift || k == Key.RightShift ||
+            k == Key.LeftAlt || k == Key.RightAlt ||
+            k == Key.LWin || k == Key.RWin;
 
         private IntPtr _hookID = IntPtr.Zero;
         private LowLevelKeyboardProc? _proc;
@@ -132,16 +139,57 @@ namespace WindowManager.Views
             _capturingShortcut = true;
             _shortcutTextBox = (TextBox)sender;
             _shortcutProgram = _shortcutTextBox.DataContext;
+            _previousShortcut = _shortcutTextBox.Text;
 
-            if (sender is FrameworkElement fe && fe.DataContext is ProcessModel p)
-                MessageBox.Show($"Name: {p.DisplayName}\nPath: {p.Path}", "This row");
+            _shortcutTextBox.Text = "Press a Shortcut";
+            PreviewKeyDown += OnShortutKeyDown;
+
+            this.Focus();
+
 
             _rightShiftDown = _leftShiftDown = false;
+
+
 
             e.Handled = true;
         }
 
+        private void OnShortutKeyDown(object sender, KeyEventArgs e)
+        {
+            if (!_capturingShortcut)
+                return;
 
+            var key = (e.Key == Key.System) ? e.SystemKey : e.Key;
+
+            if (key == Key.Escape)
+            {
+                _shortcutTextBox.Text = _previousShortcut;
+                PreviewKeyDown -= OnShortutKeyDown;
+                e.Handled = true;
+                return;
+            }
+
+            if (IsModifierKey(key)) 
+            {
+                e.Handled = true;
+                return;
+            }
+
+            var mods = Keyboard.Modifiers;
+            var combo = new List<String>();
+            if ((mods & ModifierKeys.Shift) != 0) combo.Add("Shift");
+            if ((mods & ModifierKeys.Control) != 0) combo.Add("Ctrl");
+            if ((mods & ModifierKeys.Alt) != 0) combo.Add("Alt");
+
+            combo.Add(key.ToString());
+            string shortcutLabel = string.Join("+", combo);
+
+            _shortcutTextBox.Text = shortcutLabel;
+            _capturingShortcut = false;
+            PreviewKeyDown -= OnShortutKeyDown;
+        }
+
+        
 
         [DllImport("user32.dll", SetLastError = true)]
         private static extern IntPtr SetWindowsHookEx(int idHook, LowLevelKeyboardProc lpfn, IntPtr hMod, uint dwThreadId);
