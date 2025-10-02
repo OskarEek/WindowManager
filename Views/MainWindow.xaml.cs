@@ -89,7 +89,7 @@ namespace WindowManager.Views
             {
                 int vkCode = Marshal.ReadInt32(lParam);
 
-                if (wParam == (IntPtr)WM_KEYDOWN)
+                if (wParam == WM_KEYDOWN)
                 {
                     if (vkCode == VK_LSHIFT) _leftShiftDown = true;
                     if (vkCode == VK_RSHIFT) _rightShiftDown = true;
@@ -99,7 +99,7 @@ namespace WindowManager.Views
                         OpenSearchWindow();
                     }
                 }
-                else if (wParam == (IntPtr)WM_KEYUP)
+                else if (wParam == WM_KEYUP)
                 {
                     if (vkCode == VK_LSHIFT) _leftShiftDown = false;
                     if (vkCode == VK_RSHIFT) _rightShiftDown = false;
@@ -109,21 +109,17 @@ namespace WindowManager.Views
             return CallNextHookEx(IntPtr.Zero, nCode, wParam, lParam);
         }
 
-
-
         private void OpenSearchWindow()
         {
 
             _windowService.ShowSearchWindow();
         }
 
-
         private void AddProgramButton(object sender, RoutedEventArgs e)
         {
             // Trigger ViewModel method
             (DataContext as MainViewModel)?.AddProgramButton();
         }
-
 
         private void ExitProgramButton(object sender, RoutedEventArgs e)
         {
@@ -153,12 +149,7 @@ namespace WindowManager.Views
             PreviewKeyDown += OnNewShortcutKeyDown;
 
             this.Focus();
-
-
             _rightShiftDown = _leftShiftDown = false;
-
-
-
             e.Handled = true;
         }
 
