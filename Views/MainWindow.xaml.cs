@@ -14,29 +14,22 @@ using WindowManager.Models;
 using WindowManager.Services;
 using WindowManager.ViewModels;
 
+
 namespace WindowManager.Views
 {
     public partial class MainWindow : Window, IDisposable
     {
-
-
         private const int WH_KEYBOARD_LL = 13;
         private const int WM_KEYDOWN = 0x0100;
         private const int WM_KEYUP = 0x0101;
         private const int VK_LSHIFT = 0xA0;
         private const int VK_RSHIFT = 0xA1;
-        private const int VK_LCONTROL = 0xA2;
-        private const int VK_LALT = 0xA4;
-        private const int VK_RALT = 0xA5;
-        private const int VK_ALT = 0x12;
-
 
         private readonly WindowService _windowService;
+        private readonly ShortcutService _shortcutService = new();
 
-        private bool _leftShiftDown, _rightShiftDown = false;
-
-        private bool _ctrlDown, _shiftDown, _altDown = false;
-
+        private bool _leftShiftDown = false;
+        private bool _rightShiftDown = false;
 
         private bool _capturingShortcut = false;
 
@@ -46,8 +39,7 @@ namespace WindowManager.Views
         private static bool IsModifierKey(Key k) =>
             k == Key.LeftCtrl || k == Key.RightCtrl ||
             k == Key.LeftShift || k == Key.RightShift ||
-            k == Key.LeftAlt || k == Key.RightAlt ||
-            k == Key.LWin || k == Key.RWin;
+            k == Key.LeftAlt || k == Key.RightAlt;
 
         private IntPtr _hookID = IntPtr.Zero;
         private LowLevelKeyboardProc? _proc;
@@ -64,6 +56,13 @@ namespace WindowManager.Views
             {
                 _proc = HookCallback;
                 _hookID = SetHook(_proc);
+
+                _shortcutService.Initialize(this);
+                _shortcutService.RegisterTestHotkey();
+                _shortcutService.HotkeyPressed += () =>
+                {
+                    MessageBox.Show("Triggered hotkey");
+                };
             };
 
             Closing += (s, e) =>
@@ -92,10 +91,6 @@ namespace WindowManager.Views
 
                 if (wParam == (IntPtr)WM_KEYDOWN)
                 {
-                    if(vkCode == VK_LCONTROL) _ctrlDown = true;
-                    if(vkCode == VK_LSHIFT) _shiftDown = true;
-                    if(vkCode == VK_LALT || vkCode == VK_RALT || vkCode == VK_ALT) _altDown = true;
-
                     if (vkCode == VK_LSHIFT) _leftShiftDown = true;
                     if (vkCode == VK_RSHIFT) _rightShiftDown = true;
 
@@ -103,15 +98,9 @@ namespace WindowManager.Views
                     {
                         OpenSearchWindow();
                     }
-
-                    Debug.WriteLine($"ctrl: {_ctrlDown}, shift: {_shiftDown}, alt: {_altDown}");
                 }
                 else if (wParam == (IntPtr)WM_KEYUP)
                 {
-                    if (vkCode == VK_LCONTROL) _ctrlDown = false;
-                    if (vkCode == VK_LSHIFT) _shiftDown = false;
-                    if (vkCode == VK_LALT) _altDown = false;
-
                     if (vkCode == VK_LSHIFT) _leftShiftDown = false;
                     if (vkCode == VK_RSHIFT) _rightShiftDown = false;
                 }
@@ -119,6 +108,7 @@ namespace WindowManager.Views
 
             return CallNextHookEx(IntPtr.Zero, nCode, wParam, lParam);
         }
+
 
 
         private void OpenSearchWindow()
@@ -175,7 +165,7 @@ namespace WindowManager.Views
         private void OnNewShortcutKeyDown(object sender, KeyEventArgs e)
         {
             var key = (e.Key == Key.System) ? e.SystemKey : e.Key;
-
+            
             if (!_capturingShortcut)
                 return;
 
@@ -217,17 +207,17 @@ namespace WindowManager.Views
 
         }
 
-
-        private void ModifiersInpt(object sender, KeyEventArgs e)
+        public void Dispose()
         {
-            if (IsModifierKey(e.Key))
+            _shortcutService.Dispose();
+            if (_hookID != IntPtr.Zero)
             {
-                MessageBox.Show(e.ToString());
+                UnhookWindowsHookEx(_hookID);
+                _hookID = IntPtr.Zero;
             }
-
+            _proc = null;
         }
 
- 
         [DllImport("user32.dll", SetLastError = true)]
         private static extern IntPtr SetWindowsHookEx(int idHook, LowLevelKeyboardProc lpfn, IntPtr hMod, uint dwThreadId);
 
@@ -241,14 +231,5 @@ namespace WindowManager.Views
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
         private static extern IntPtr GetModuleHandle(string lpModuleName);
 
-        public void Dispose()
-        {
-            if (_hookID != IntPtr.Zero)
-            {
-                UnhookWindowsHookEx(_hookID);
-                _hookID = IntPtr.Zero;
-            }
-            _proc = null;
-        }
     }
 }
