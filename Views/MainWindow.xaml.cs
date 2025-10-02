@@ -18,16 +18,25 @@ namespace WindowManager.Views
 {
     public partial class MainWindow : Window, IDisposable
     {
+
+
         private const int WH_KEYBOARD_LL = 13;
         private const int WM_KEYDOWN = 0x0100;
         private const int WM_KEYUP = 0x0101;
         private const int VK_LSHIFT = 0xA0;
         private const int VK_RSHIFT = 0xA1;
+        private const int VK_LCONTROL = 0xA2;
+        private const int VK_LALT = 0xA4;
+        private const int VK_RALT = 0xA5;
+        private const int VK_ALT = 0x12;
+
 
         private readonly WindowService _windowService;
 
-        private bool _leftShiftDown = false;
-        private bool _rightShiftDown = false;
+        private bool _leftShiftDown, _rightShiftDown = false;
+
+        private bool _ctrlDown, _shiftDown, _altDown = false;
+
 
         private bool _capturingShortcut = false;
 
@@ -83,6 +92,10 @@ namespace WindowManager.Views
 
                 if (wParam == (IntPtr)WM_KEYDOWN)
                 {
+                    if(vkCode == VK_LCONTROL) _ctrlDown = true;
+                    if(vkCode == VK_LSHIFT) _shiftDown = true;
+                    if(vkCode == VK_LALT || vkCode == VK_RALT || vkCode == VK_ALT) _altDown = true;
+
                     if (vkCode == VK_LSHIFT) _leftShiftDown = true;
                     if (vkCode == VK_RSHIFT) _rightShiftDown = true;
 
@@ -90,9 +103,15 @@ namespace WindowManager.Views
                     {
                         OpenSearchWindow();
                     }
+
+                    Debug.WriteLine($"ctrl: {_ctrlDown}, shift: {_shiftDown}, alt: {_altDown}");
                 }
                 else if (wParam == (IntPtr)WM_KEYUP)
                 {
+                    if (vkCode == VK_LCONTROL) _ctrlDown = false;
+                    if (vkCode == VK_LSHIFT) _shiftDown = false;
+                    if (vkCode == VK_LALT) _altDown = false;
+
                     if (vkCode == VK_LSHIFT) _leftShiftDown = false;
                     if (vkCode == VK_RSHIFT) _rightShiftDown = false;
                 }
@@ -141,7 +160,7 @@ namespace WindowManager.Views
             _shortcutProgram = _shortcutTextBox.DataContext as ProcessModel;
 
             _shortcutTextBox.Text = "Press a Shortcut";
-            PreviewKeyDown += OnShortutKeyDown;
+            PreviewKeyDown += OnNewShortcutKeyDown;
 
             this.Focus();
 
@@ -153,12 +172,12 @@ namespace WindowManager.Views
             e.Handled = true;
         }
 
-        private void OnShortutKeyDown(object sender, KeyEventArgs e)
+        private void OnNewShortcutKeyDown(object sender, KeyEventArgs e)
         {
+            var key = (e.Key == Key.System) ? e.SystemKey : e.Key;
+
             if (!_capturingShortcut)
                 return;
-
-            var key = (e.Key == Key.System) ? e.SystemKey : e.Key;
 
             if (key == Key.Escape)
             {
@@ -166,7 +185,7 @@ namespace WindowManager.Views
                     _shortcutProgram.Shortcut = null;
                 _shortcutTextBox?.GetBindingExpression(TextBox.TextProperty)?.UpdateTarget();
 
-                PreviewKeyDown -= OnShortutKeyDown;
+                PreviewKeyDown -= OnNewShortcutKeyDown;
                 e.Handled = true;
                 return;
             }
@@ -187,7 +206,7 @@ namespace WindowManager.Views
             string shortcutLabel = string.Join("+", combo);
 
             _capturingShortcut = false;
-            PreviewKeyDown -= OnShortutKeyDown;
+            PreviewKeyDown -= OnNewShortcutKeyDown;
 
             if (_shortcutProgram != null)
                 _shortcutProgram.Shortcut = shortcutLabel;
@@ -198,8 +217,17 @@ namespace WindowManager.Views
 
         }
 
-        
 
+        private void ModifiersInpt(object sender, KeyEventArgs e)
+        {
+            if (IsModifierKey(e.Key))
+            {
+                MessageBox.Show(e.ToString());
+            }
+
+        }
+
+ 
         [DllImport("user32.dll", SetLastError = true)]
         private static extern IntPtr SetWindowsHookEx(int idHook, LowLevelKeyboardProc lpfn, IntPtr hMod, uint dwThreadId);
 
