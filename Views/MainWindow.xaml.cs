@@ -26,7 +26,9 @@ namespace WindowManager.Views
         private const int VK_RSHIFT = 0xA1;
 
         private readonly WindowService _windowService;
-        private readonly ShortcutService _shortcutService = new();
+        private readonly ConfigService _configService;
+        private readonly ShortcutService _shortcutService; 
+        private readonly ProgramService _programService;
 
         private bool _leftShiftDown = false;
         private bool _rightShiftDown = false;
@@ -46,11 +48,13 @@ namespace WindowManager.Views
 
         private delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
 
-        public MainWindow(MainViewModel viewModel, WindowService windowService)
+        public MainWindow(MainViewModel viewModel, WindowService windowService, ConfigService configService, ProgramService programService)
         {
             InitializeComponent();
             _windowService = windowService;
             DataContext = viewModel;
+
+            _shortcutService = new ShortcutService(configService, programService);
 
             Loaded += (s, e) =>
             {
@@ -58,17 +62,15 @@ namespace WindowManager.Views
                 _hookID = SetHook(_proc);
 
                 _shortcutService.Initialize(this);
-                _shortcutService.RegisterTestHotkey();
-                _shortcutService.HotkeyPressed += () =>
-                {
-                    MessageBox.Show("Triggered hotkey");
-                };
+                _shortcutService.RegisterAllHotkeysFromConfig();
+
             };
 
             Closing += (s, e) =>
             {
                 Application.Current.Shutdown();
             };
+            _configService = configService;
         }
 
         private IntPtr SetHook(LowLevelKeyboardProc proc)
