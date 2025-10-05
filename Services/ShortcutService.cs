@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows;
-using System.Windows.Interop;
 using System.Windows.Input;
-using System.Diagnostics;
+using System.Windows.Interop;
+using WindowManager.Models;
 
 namespace WindowManager.Services
 {
@@ -18,7 +19,7 @@ namespace WindowManager.Services
         private const uint MOD_SHIFT = 0x0004;
 
         private int _hotKeyListenerID = 1;
-        private readonly Dictionary<int, string> _shortcutActions = new();
+        private readonly Dictionary<int, ProcessModel> _shortcutActions = new();
 
         private HwndSource? _src;
         private IntPtr _hwnd;
@@ -61,7 +62,7 @@ namespace WindowManager.Services
                     uint shortcutKey = GetShortcutKey(shortcutList.Last());
 
                     RegisterHotKey(_hwnd, _hotKeyListenerID, mods, shortcutKey);
-                    _shortcutActions.Add(_hotKeyListenerID, program.Path);
+                    _shortcutActions.Add(_hotKeyListenerID, program);
                     _hotKeyListenerID++;
                 }
             }
@@ -114,8 +115,8 @@ namespace WindowManager.Services
         {
             if (msg == WM_HOTKEY && _shortcutActions.ContainsKey(wParam.ToInt32()))
             {
-                string pathToOpen = _shortcutActions[wParam.ToInt32()];
-                _programService.StartOrOpenProgram(pathToOpen);
+                ProcessModel programToOpen = _shortcutActions[wParam.ToInt32()];
+                _programService.StartOrOpenProgram(programToOpen);
                 handled = true;
             }
             return IntPtr.Zero;
