@@ -169,7 +169,6 @@ namespace WindowManager.Views
             {
                 _shortcutProgram.Shortcut = "";
                 (DataContext as MainViewModel)?.SaveShortcut(_shortcutProgram);
-                _shortcutTextBox?.GetBindingExpression(TextBox.TextProperty)?.UpdateTarget();
 
                 PreviewKeyDown -= OnNewShortcutKeyDown;
                 _capturingShortcut = false;
@@ -182,7 +181,6 @@ namespace WindowManager.Views
             if (key == Key.Escape)
             {
                 _shortcutTextBox.Text = _previousShortcut;
-                _shortcutTextBox?.GetBindingExpression(TextBox.TextProperty).UpdateTarget();
 
                 PreviewKeyDown -= OnNewShortcutKeyDown;
                 _capturingShortcut = false;
@@ -215,7 +213,6 @@ namespace WindowManager.Views
 
             (DataContext as MainViewModel)?.SaveShortcut(_shortcutProgram);
 
-            _shortcutTextBox?.GetBindingExpression(TextBox.TextProperty)?.UpdateTarget();
 
         }
 
