@@ -11,6 +11,7 @@ namespace WindowManager.ViewModels
         private readonly ConfigService _configService;
         private string? _programPath;
         private string? _errorMessage;
+        private ProcessModel? _selectedProgram;
         public ObservableCollection<ProcessModel> StoredPrograms { get; }
         public string? ProgramPath
         {
@@ -37,6 +38,19 @@ namespace WindowManager.ViewModels
             }
         }
 
+        public ProcessModel? SelectedProgram
+        {
+            get => _selectedProgram;
+            set
+            {
+                if (_selectedProgram != value)
+                {
+                    _selectedProgram = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ProcessModel)));
+                }
+            }
+        }
+
         public event PropertyChangedEventHandler? PropertyChanged;
         public MainViewModel(ConfigService configSerivce)
         {
@@ -45,7 +59,7 @@ namespace WindowManager.ViewModels
             RefreshStoredPrograms();
         }
 
-        public void AddProgramButton()
+        public void AddProgram()
         {
             if (string.IsNullOrEmpty(_programPath))
                 return;
@@ -71,7 +85,17 @@ namespace WindowManager.ViewModels
             ProgramPath = "";
         }
 
-        public void RefreshStoredPrograms()
+        public void DeleteSelectedProgram()
+        {
+            if (_selectedProgram == null)
+                return;
+
+            _configService.DeleteProgram(_selectedProgram);
+            _selectedProgram = null;
+            RefreshStoredPrograms();
+        }
+
+        private void RefreshStoredPrograms()
         {
             Config config = _configService.GetConfig();
             StoredPrograms.Clear();
@@ -86,7 +110,7 @@ namespace WindowManager.ViewModels
             _configService.QuickSaveShortcut(program);
         }
 
-        public void SetErrorMessage(string errorMessage)
+        private void SetErrorMessage(string errorMessage)
         {
             ErrorMessage = errorMessage;
         }

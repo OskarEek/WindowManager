@@ -122,7 +122,7 @@ namespace WindowManager.Views
         private void AddProgramButton(object sender, RoutedEventArgs e)
         {
             // Trigger ViewModel method
-            (DataContext as MainViewModel)?.AddProgramButton();
+            (DataContext as MainViewModel)?.AddProgram();
         }
 
         private void ExitProgramButton(object sender, RoutedEventArgs e)

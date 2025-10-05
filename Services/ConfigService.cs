@@ -20,6 +20,8 @@ namespace WindowManager.Services
             _fileService = fileService;
             _fileService.CreateFileIfNotExist(s_configFilePath);
             _config = _fileService.GetJsonFileData<Config>(s_configFilePath) ?? new();
+
+            ValidateProgramPaths();
         }
 
         public Config GetConfig()
@@ -44,10 +46,12 @@ namespace WindowManager.Services
             var program = new ProcessModel()
             {
                 Name = name,
-                Path = exePath
+                Path = exePath,
+                IsValidProgramPath = true
             };
 
             _config.Programs.Add(program);
+            ValidateProgramPaths();
             _fileService.WriteToJsonFile<Config>(s_configFilePath, _config);
         }
 
@@ -65,6 +69,24 @@ namespace WindowManager.Services
             current.Shortcut = program.Shortcut;
 
             _fileService.WriteToJsonFile(s_configFilePath, _config);
+        }
+      
+        public void DeleteProgram(ProcessModel processModel)
+        {
+            if (!_config.Programs.Contains(processModel))
+                throw new Exception("Tried deleting non-existing program from config");
+
+            _config.Programs.Remove(processModel);
+            ValidateProgramPaths();
+            _fileService.WriteToJsonFile(s_configFilePath, _config);
+        }
+
+        public void ValidateProgramPaths()
+        {
+            foreach (ProcessModel program in _config.Programs)
+            {
+                program.IsValidProgramPath = program.Path == null ? false : Path.Exists(program.Path);
+            }
         }
     }
 }

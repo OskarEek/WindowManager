@@ -60,7 +60,18 @@
                         Click="ExitProgramButton"/>
             </Grid>
         </Grid>
-        <ListBox Grid.Row="1"  Grid.Column="1" ItemsSource="{Binding StoredPrograms}" Background="#95000000" Foreground="#E5E5E5">
+        <ListBox Grid.Row="1"  Grid.Column="1" ItemsSource="{Binding StoredPrograms}" SelectedItem="{Binding SelectedProgram, Mode=TwoWay}" Background="#95000000" Foreground="#E5E5E5">
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsValidProgramPath}" Value="False">
+                            <Setter Property="Background" Value="#80C14949"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ListBox.ItemContainerStyle>
+            
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid>
@@ -91,8 +102,8 @@
                                  Foreground="#e5e5e5"
                                  Text="{Binding Shortcut, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                  HorizontalContentAlignment="Center"
-                                 VerticalContentAlignment="Center"
-                                 MouseDoubleClick="UpdateKeyboardShortcut"/>
+                                 VerticalContentAlignment="Center"/>
+
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
@@ -113,6 +124,7 @@
                        Foreground="#c14949"/>
 
             <Button Content="Add" Width="100" Margin="0,0,0,5" Click="AddProgramButton"/>
+            <Button Content="Delete selected" Width="100" Margin="0,10,0,5" Background="#c14949" Click="DeleteSelectedProgramButton"/>
         </StackPanel>
     </Grid>
 </Window>

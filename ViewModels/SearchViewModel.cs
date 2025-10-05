@@ -59,11 +59,13 @@ namespace WindowManager.ViewModels
                 return false;
 
             if (string.IsNullOrEmpty(_selectedProgram.Path))
-
+            {
                 _selectedProgram.Path = GetPatchByID(_selectedProgram.ProcessId);
+                _selectedProgram.IsValidProgramPath = true;
+            }
 
 
-            if (string.IsNullOrWhiteSpace(_selectedProgram.Path))
+            if (string.IsNullOrWhiteSpace(_selectedProgram.Path) || !_selectedProgram.IsValidProgramPath)
                 return false; 
 
              _programService.StartProgram(_selectedProgram.Path);

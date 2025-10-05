@@ -19,7 +19,7 @@ namespace WindowManager.Services
             {
                 OpenProgram(processModel.ProcessId.Value);
             }
-            else if (!string.IsNullOrEmpty(processModel.Path))
+            else if (!string.IsNullOrEmpty(processModel.Path) && processModel.IsValidProgramPath)
             {
                 StartProgram(processModel.Path);
             }

@@ -9,9 +9,10 @@ namespace WindowManager.Models
     public class ProcessModel
     {
         public string Name { get; set; } = "";
-        public string DisplayName => Name.ToLower();
         public int? ProcessId { get; set; }
         public string? Path { get; set; }
         public string? Shortcut { get; set; }
+        public bool IsValidProgramPath { get; set; }
+        public string DisplayName => Name.ToLower();
     }
 }
