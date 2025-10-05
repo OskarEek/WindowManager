@@ -1,14 +1,19 @@
-﻿using System.Diagnostics;
+﻿using System.Data;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using WindowManager.Models;
 using WindowManager.Services;
 using WindowManager.ViewModels;
+
 
 namespace WindowManager.Views
 {
@@ -21,31 +26,53 @@ namespace WindowManager.Views
         private const int VK_RSHIFT = 0xA1;
 
         private readonly WindowService _windowService;
+        private readonly ConfigService _configService;
+        private readonly ShortcutService _shortcutService; 
+        private readonly ProgramService _programService;
 
-        private bool leftShiftDown = false;
-        private bool rightShiftDown = false;
+        private bool _leftShiftDown = false;
+        private bool _rightShiftDown = false;
+
+        private bool _capturingShortcut = false;
+
+        private TextBox? _shortcutTextBox;
+        private ProcessModel? _shortcutProgram;
+        private string _previousShortcut;
+
+
+        private static bool IsModifierKey(Key k) =>
+            k == Key.LeftCtrl || k == Key.RightCtrl ||
+            k == Key.LeftShift || k == Key.RightShift ||
+            k == Key.LeftAlt || k == Key.RightAlt;
 
         private IntPtr _hookID = IntPtr.Zero;
         private LowLevelKeyboardProc? _proc;
 
         private delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
 
-        public MainWindow(MainViewModel viewModel, WindowService windowService)
+        public MainWindow(MainViewModel viewModel, WindowService windowService, ConfigService configService, ProgramService programService)
         {
             InitializeComponent();
             _windowService = windowService;
             DataContext = viewModel;
 
+            _shortcutService = new ShortcutService(configService, programService);
+
             Loaded += (s, e) =>
             {
                 _proc = HookCallback;
                 _hookID = SetHook(_proc);
+
+                _shortcutService.Initialize(this, () => _capturingShortcut);
+                _shortcutService.RegisterAllHotkeysFromConfig();
+
             };
 
             Closing += (s, e) =>
             {
                 Application.Current.Shutdown();
             };
+            _configService = configService;
         }
 
         private IntPtr SetHook(LowLevelKeyboardProc proc)
@@ -59,24 +86,27 @@ namespace WindowManager.Views
 
         private IntPtr HookCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
+            if (_capturingShortcut) 
+                return CallNextHookEx(IntPtr.Zero, nCode, wParam, lParam);  
+            
             if (nCode >= 0)
             {
                 int vkCode = Marshal.ReadInt32(lParam);
 
-                if (wParam == (IntPtr)WM_KEYDOWN)
+                if (wParam == WM_KEYDOWN)
                 {
-                    if (vkCode == VK_LSHIFT) leftShiftDown = true;
-                    if (vkCode == VK_RSHIFT) rightShiftDown = true;
+                    if (vkCode == VK_LSHIFT) _leftShiftDown = true;
+                    if (vkCode == VK_RSHIFT) _rightShiftDown = true;
 
-                    if (leftShiftDown && rightShiftDown)
+                    if (_leftShiftDown && _rightShiftDown)
                     {
                         OpenSearchWindow();
                     }
                 }
-                else if (wParam == (IntPtr)WM_KEYUP)
+                else if (wParam == WM_KEYUP)
                 {
-                    if (vkCode == VK_LSHIFT) leftShiftDown = false;
-                    if (vkCode == VK_RSHIFT) rightShiftDown = false;
+                    if (vkCode == VK_LSHIFT) _leftShiftDown = false;
+                    if (vkCode == VK_RSHIFT) _rightShiftDown = false;
                 }
             }
 
@@ -89,17 +119,10 @@ namespace WindowManager.Views
             _windowService.ShowSearchWindow();
         }
 
-
         private void AddProgramButton(object sender, RoutedEventArgs e)
         {
             // Trigger ViewModel method
             (DataContext as MainViewModel)?.AddProgram();
-        }
-
-        private void DeleteSelectedProgramButton(object sender, RoutedEventArgs e)
-        {
-            // Trigger ViewModel method
-            (DataContext as MainViewModel)?.DeleteSelectedProgram();
         }
 
         private void ExitProgramButton(object sender, RoutedEventArgs e)
@@ -119,7 +142,94 @@ namespace WindowManager.Views
                 try { DragMove(); } catch { }
             }
         }
-        
+
+        private void UpdateKeyboardShortcut(object sender, MouseButtonEventArgs e)
+        {
+            _capturingShortcut = true;
+            _shortcutTextBox = (TextBox)sender;
+            _shortcutProgram = _shortcutTextBox.DataContext as ProcessModel;
+            _previousShortcut = _shortcutProgram.Shortcut;
+
+        _shortcutTextBox.Text = "Press a Shortcut";
+            this.Focus();
+            PreviewKeyDown += OnNewShortcutKeyDown;
+
+            _rightShiftDown = _leftShiftDown = false;
+            e.Handled = true;
+        }
+
+        private void OnNewShortcutKeyDown(object sender, KeyEventArgs e)
+        {
+            var key = (e.Key == Key.System) ? e.SystemKey : e.Key;
+            
+            if (!_capturingShortcut)
+                return;
+
+            if (key == Key.Back)
+            {
+                _shortcutProgram.Shortcut = "";
+                (DataContext as MainViewModel)?.SaveShortcut(_shortcutProgram);
+                _shortcutTextBox?.GetBindingExpression(TextBox.TextProperty)?.UpdateTarget();
+
+                PreviewKeyDown -= OnNewShortcutKeyDown;
+                _capturingShortcut = false;
+                _shortcutService.UpdateExistingShortcutListener(_shortcutProgram);
+
+                e.Handled = true;
+                return;
+            }
+
+            if (key == Key.Escape)
+            {
+                _shortcutTextBox.Text = _previousShortcut;
+                _shortcutTextBox?.GetBindingExpression(TextBox.TextProperty).UpdateTarget();
+
+                PreviewKeyDown -= OnNewShortcutKeyDown;
+                _capturingShortcut = false;
+
+                e.Handled = true;
+                return;
+            }
+
+            if (IsModifierKey(key)) 
+            {
+                e.Handled = true;
+                return;
+            }
+
+            var mods = Keyboard.Modifiers;
+            var combo = new List<String>();
+            if ((mods & ModifierKeys.Shift) != 0) combo.Add("Shift");
+            if ((mods & ModifierKeys.Control) != 0) combo.Add("Ctrl");
+            if ((mods & ModifierKeys.Alt) != 0) combo.Add("Alt");
+
+            combo.Add(key.ToString());
+            string shortcutLabel = string.Join("+", combo);
+
+            _capturingShortcut = false;
+            PreviewKeyDown -= OnNewShortcutKeyDown;
+
+            if (_shortcutProgram != null)
+                _shortcutProgram.Shortcut = shortcutLabel;
+                _shortcutService.UpdateExistingShortcutListener(_shortcutProgram);
+
+            (DataContext as MainViewModel)?.SaveShortcut(_shortcutProgram);
+
+            _shortcutTextBox?.GetBindingExpression(TextBox.TextProperty)?.UpdateTarget();
+
+        }
+
+        public void Dispose()
+        {
+            _shortcutService.Dispose();
+            if (_hookID != IntPtr.Zero)
+            {
+                UnhookWindowsHookEx(_hookID);
+                _hookID = IntPtr.Zero;
+            }
+            _proc = null;
+        }
+
         [DllImport("user32.dll", SetLastError = true)]
         private static extern IntPtr SetWindowsHookEx(int idHook, LowLevelKeyboardProc lpfn, IntPtr hMod, uint dwThreadId);
 
@@ -133,14 +243,5 @@ namespace WindowManager.Views
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
         private static extern IntPtr GetModuleHandle(string lpModuleName);
 
-        public void Dispose()
-        {
-            if (_hookID != IntPtr.Zero)
-            {
-                UnhookWindowsHookEx(_hookID);
-                _hookID = IntPtr.Zero;
-            }
-            _proc = null;
-        }
     }
 }
