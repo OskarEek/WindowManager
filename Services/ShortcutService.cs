@@ -57,16 +57,21 @@ namespace WindowManager.Services
             var config = _configService.GetConfig();
             foreach (var program in config.Programs)
             {
-                if (program.Shortcut != "" && program.Shortcut != null)
-                {
-                    var shortcutList = SplitShortcut(program.Shortcut);
-                    uint mods = GetModifiers(shortcutList);
-                    uint shortcutKey = GetShortcutKey(shortcutList.Last());
+                RegisterHotkeyFromProgram(program);
+            }
+        }
 
-                    RegisterHotKey(_hwnd, _hotKeyListenerID, mods, shortcutKey);
-                    _shortcutActions.Add(_hotKeyListenerID, program);
-                    _hotKeyListenerID++;
-                }
+        private void RegisterHotkeyFromProgram(ProcessModel program)
+        {
+            if (program.Shortcut != "" && program.Shortcut != null)
+            {
+                var shortcutList = SplitShortcut(program.Shortcut);
+                uint mods = GetModifiers(shortcutList);
+                uint shortcutKey = GetShortcutKey(shortcutList.Last());
+
+                RegisterHotKey(_hwnd, _hotKeyListenerID, mods, shortcutKey);
+                _shortcutActions.Add(_hotKeyListenerID, program);
+                _hotKeyListenerID++;
             }
         }
 
@@ -110,6 +115,20 @@ namespace WindowManager.Services
             }
 
                 return vk;
+        }
+
+        public void UpdateExistingShortcutListener(ProcessModel program)
+        {
+
+            var reverseDict = _shortcutActions.ToDictionary(x => x.Value, x => x.Key);
+            if (reverseDict.TryGetValue(program, out int listenerID))
+            {
+                UnregisterHotKey(_hwnd, listenerID);
+            }
+            if (program.Shortcut != "")
+            {
+                RegisterHotkeyFromProgram(program);
+            }
         }
 
         private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)

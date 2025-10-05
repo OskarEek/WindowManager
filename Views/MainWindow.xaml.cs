@@ -37,6 +37,8 @@ namespace WindowManager.Views
 
         private TextBox? _shortcutTextBox;
         private ProcessModel? _shortcutProgram;
+        private string _previousShortcut;
+
 
         private static bool IsModifierKey(Key k) =>
             k == Key.LeftCtrl || k == Key.RightCtrl ||
@@ -146,8 +148,9 @@ namespace WindowManager.Views
             _capturingShortcut = true;
             _shortcutTextBox = (TextBox)sender;
             _shortcutProgram = _shortcutTextBox.DataContext as ProcessModel;
+            _previousShortcut = _shortcutProgram.Shortcut;
 
-            _shortcutTextBox.Text = "Press a Shortcut";
+        _shortcutTextBox.Text = "Press a Shortcut";
             this.Focus();
             PreviewKeyDown += OnNewShortcutKeyDown;
 
@@ -169,12 +172,21 @@ namespace WindowManager.Views
                 _shortcutTextBox?.GetBindingExpression(TextBox.TextProperty)?.UpdateTarget();
 
                 PreviewKeyDown -= OnNewShortcutKeyDown;
+                _capturingShortcut = false;
+                _shortcutService.UpdateExistingShortcutListener(_shortcutProgram);
+
                 e.Handled = true;
                 return;
             }
 
             if (key == Key.Escape)
             {
+                _shortcutTextBox.Text = _previousShortcut;
+                _shortcutTextBox?.GetBindingExpression(TextBox.TextProperty).UpdateTarget();
+
+                PreviewKeyDown -= OnNewShortcutKeyDown;
+                _capturingShortcut = false;
+
                 e.Handled = true;
                 return;
             }
@@ -199,6 +211,7 @@ namespace WindowManager.Views
 
             if (_shortcutProgram != null)
                 _shortcutProgram.Shortcut = shortcutLabel;
+                _shortcutService.UpdateExistingShortcutListener(_shortcutProgram);
 
             (DataContext as MainViewModel)?.SaveShortcut(_shortcutProgram);
 
