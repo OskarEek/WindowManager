@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
 using WindowManager.Models;
+using WindowManager.Views;
 
 namespace WindowManager.Services
 {
@@ -14,7 +15,6 @@ namespace WindowManager.Services
         private readonly ProgramService _programService;
 
         private const int WM_HOTKEY = 0x0312;
-
         private const uint MOD_CONTROL = 0x0002;
         private const uint MOD_SHIFT = 0x0004;
 
@@ -26,20 +26,22 @@ namespace WindowManager.Services
 
         public event Action? HotkeyPressed;
 
+        private Func<bool> _isCapturingNewShortcut;
 
         public ShortcutService(ConfigService configService, ProgramService programService)
         {
             _configService = configService;
             _programService = programService;
         }
-        public void Initialize(Window window)
+        public void Initialize(MainWindow window, Func<bool> isCapturingNewShortcutProvider)
         {
+
+            _isCapturingNewShortcut = isCapturingNewShortcutProvider;
             _hwnd = new WindowInteropHelper(window).Handle;
             _src = HwndSource.FromHwnd(_hwnd);
             _src.AddHook(WndProc);
 
         }
-
 
         public bool RegisterTestHotkey()
         {
@@ -109,15 +111,25 @@ namespace WindowManager.Services
 
                 return vk;
         }
-        
 
         private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
-            if (msg == WM_HOTKEY && _shortcutActions.ContainsKey(wParam.ToInt32()))
+            if (msg == WM_HOTKEY)
             {
-                ProcessModel programToOpen = _shortcutActions[wParam.ToInt32()];
-                _programService.StartOrOpenProgram(programToOpen);
-                handled = true;
+                if (_isCapturingNewShortcut())
+                {
+                    return IntPtr.Zero;
+                }
+
+                var id = wParam.ToInt32();
+                
+                if (_shortcutActions.ContainsKey(id))
+                {
+                    ProcessModel programToOpen = _shortcutActions[id];
+                    _programService.StartOrOpenProgram(programToOpen);
+                    handled = true;
+                }
+
             }
             return IntPtr.Zero;
         }

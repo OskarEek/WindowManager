@@ -61,7 +61,7 @@ namespace WindowManager.Views
                 _proc = HookCallback;
                 _hookID = SetHook(_proc);
 
-                _shortcutService.Initialize(this);
+                _shortcutService.Initialize(this, () => _capturingShortcut);
                 _shortcutService.RegisterAllHotkeysFromConfig();
 
             };
@@ -148,9 +148,9 @@ namespace WindowManager.Views
             _shortcutProgram = _shortcutTextBox.DataContext as ProcessModel;
 
             _shortcutTextBox.Text = "Press a Shortcut";
+            this.Focus();
             PreviewKeyDown += OnNewShortcutKeyDown;
 
-            this.Focus();
             _rightShiftDown = _leftShiftDown = false;
             e.Handled = true;
         }
@@ -162,13 +162,19 @@ namespace WindowManager.Views
             if (!_capturingShortcut)
                 return;
 
-            if (key == Key.Escape)
+            if (key == Key.Back)
             {
-                if (_shortcutProgram != null)
-                    _shortcutProgram.Shortcut = null;
+                _shortcutProgram.Shortcut = "";
+                (DataContext as MainViewModel)?.SaveShortcut(_shortcutProgram);
                 _shortcutTextBox?.GetBindingExpression(TextBox.TextProperty)?.UpdateTarget();
 
                 PreviewKeyDown -= OnNewShortcutKeyDown;
+                e.Handled = true;
+                return;
+            }
+
+            if (key == Key.Escape)
+            {
                 e.Handled = true;
                 return;
             }
