@@ -124,6 +124,11 @@ namespace WindowManager.Views
             // Trigger ViewModel method
             (DataContext as MainViewModel)?.AddProgram();
         }
+        private void DeleteSelectedProgramButton(object sender, RoutedEventArgs e)
+        {
+            (DataContext as MainViewModel)?.DeleteSelectedProgram();
+
+        }
 
         private void ExitProgramButton(object sender, RoutedEventArgs e)
         {
@@ -142,6 +147,7 @@ namespace WindowManager.Views
                 try { DragMove(); } catch { }
             }
         }
+
 
         private void UpdateKeyboardShortcut(object sender, MouseButtonEventArgs e)
         {
