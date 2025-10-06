@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using WindowManager.Models;
 using WindowManager.Services;
@@ -9,6 +10,7 @@ namespace WindowManager.ViewModels
     public class MainViewModel : INotifyPropertyChanged
     {
         private readonly ConfigService _configService;
+        private readonly ShortcutService _shortcutService;
         private string? _programPath;
         private string? _errorMessage;
         private ProcessModel? _selectedProgram;
@@ -52,9 +54,10 @@ namespace WindowManager.ViewModels
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
-        public MainViewModel(ConfigService configSerivce)
+        public MainViewModel(ConfigService configSerivce, ShortcutService shortcutService)
         {
             _configService = configSerivce;
+            _shortcutService = shortcutService;
             StoredPrograms = new ObservableCollection<ProcessModel>();
             RefreshStoredPrograms();
         }
@@ -89,7 +92,8 @@ namespace WindowManager.ViewModels
         {
             if (_selectedProgram == null)
                 return;
-
+            Debug.WriteLine(_selectedProgram.ToString());
+            _shortcutService.RemoveProgramListener(_selectedProgram);
             _configService.DeleteProgram(_selectedProgram);
             _selectedProgram = null;
             RefreshStoredPrograms();

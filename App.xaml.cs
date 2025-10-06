@@ -23,6 +23,7 @@ public partial class App : Application
         services.AddSingleton<FileService>();
         services.AddSingleton<ConfigService>(_ => new ConfigService(_serviceProvider.GetRequiredService<FileService>()));
         services.AddSingleton<User32Service>();
+        services.AddSingleton<ShortcutService>();
         services.AddSingleton<ProgramService>();
         services.AddSingleton<WindowService>();
 

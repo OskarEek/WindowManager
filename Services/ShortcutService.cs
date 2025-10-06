@@ -20,6 +20,8 @@ namespace WindowManager.Services
 
         private int _hotKeyListenerID = 1;
         private readonly Dictionary<int, ProcessModel> _shortcutActions = new();
+        private readonly Dictionary<ProcessModel, int> _reverseShortcutActions = new();
+
 
         private HwndSource? _src;
         private IntPtr _hwnd;
@@ -71,6 +73,7 @@ namespace WindowManager.Services
 
                 RegisterHotKey(_hwnd, _hotKeyListenerID, mods, shortcutKey);
                 _shortcutActions.Add(_hotKeyListenerID, program);
+                _reverseShortcutActions.Add(program, _hotKeyListenerID);
                 _hotKeyListenerID++;
             }
         }
@@ -117,14 +120,25 @@ namespace WindowManager.Services
                 return vk;
         }
 
+        public void RemoveProgramListener(ProcessModel program)
+        {
+            Debug.WriteLine("Trying to remove listener");
+            Debug.WriteLine(_reverseShortcutActions);
+            foreach (var key in _reverseShortcutActions.Keys)
+            {
+                Debug.WriteLine(key.Name);
+            }
+            if (_reverseShortcutActions.TryGetValue(program, out var ListenerID))
+            {
+                UnregisterHotKey(_hwnd, ListenerID);
+                _reverseShortcutActions.Remove(program);
+            }
+        }
+
         public void UpdateExistingShortcutListener(ProcessModel program)
         {
+            RemoveProgramListener(program);
 
-            var reverseDict = _shortcutActions.ToDictionary(x => x.Value, x => x.Key);
-            if (reverseDict.TryGetValue(program, out int listenerID))
-            {
-                UnregisterHotKey(_hwnd, listenerID);
-            }
             if (program.Shortcut != "")
             {
                 RegisterHotkeyFromProgram(program);

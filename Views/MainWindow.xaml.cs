@@ -50,13 +50,14 @@ namespace WindowManager.Views
 
         private delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
 
-        public MainWindow(MainViewModel viewModel, WindowService windowService, ConfigService configService, ProgramService programService)
+        public MainWindow(MainViewModel viewModel, WindowService windowService, ConfigService configService, ProgramService programService, ShortcutService shortcutService)
         {
             InitializeComponent();
             _windowService = windowService;
             DataContext = viewModel;
 
-            _shortcutService = new ShortcutService(configService, programService);
+            _shortcutService = shortcutService;
+            _configService = configService;
 
             Loaded += (s, e) =>
             {
@@ -72,7 +73,6 @@ namespace WindowManager.Views
             {
                 Application.Current.Shutdown();
             };
-            _configService = configService;
         }
 
         private IntPtr SetHook(LowLevelKeyboardProc proc)
