@@ -92,7 +92,6 @@ namespace WindowManager.ViewModels
         {
             if (_selectedProgram == null)
                 return;
-            Debug.WriteLine(_selectedProgram.ToString());
             _shortcutService.RemoveProgramListener(_selectedProgram);
             _configService.DeleteProgram(_selectedProgram);
             _selectedProgram = null;

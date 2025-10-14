@@ -122,12 +122,6 @@ namespace WindowManager.Services
 
         public void RemoveProgramListener(ProcessModel program)
         {
-            Debug.WriteLine("Trying to remove listener");
-            Debug.WriteLine(_reverseShortcutActions);
-            foreach (var key in _reverseShortcutActions.Keys)
-            {
-                Debug.WriteLine(key.Name);
-            }
             if (_reverseShortcutActions.TryGetValue(program, out var ListenerID))
             {
                 UnregisterHotKey(_hwnd, ListenerID);
