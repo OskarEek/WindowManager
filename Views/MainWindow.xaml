@@ -11,7 +11,8 @@
         Foreground="#E5E5E5"
         ResizeMode="NoResize"
         AllowsTransparency="True"
-        WindowStyle="None">
+        WindowStyle="None"
+        ShowInTaskbar="False">
     
     <Grid >
         <Grid.ColumnDefinitions>
